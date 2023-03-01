@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>PROCOST</title>
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/main.css" />
+    </head>
+    <body class="app sidebar-mini">
+        <!-- Navbar -->
+        <header class="app-header">
+            <a class="app-header__logo" href="#">Procost</a>
+            <a
+                class="app-sidebar__toggle"
+                href="#"
+                data-toggle="sidebar"
+                aria-label="Hide Sidebar"></a>
+            <!-- Navbar Right Menu-->
+            <ul class="app-nav">
+                <li class="app-search">
+                    <a href="login.html" class="btn btn-info">Se déconnecter</a>
+                </li>
+            </ul>
+        </header>
+        <!-- Sidebar menu-->
+        <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+        <aside class="app-sidebar">
+            <div class="app-sidebar__user">
+                <img
+                    class="app-sidebar__user-avatar"
+                    src="img/user.jpg"
+                    alt="User Image" />
+                <div>
+                    <p class="app-sidebar__user-name">John Doe</p>
+                    <p class="app-sidebar__user-designation">Manager</p>
+                </div>
+            </div>
+            <ul class="app-menu">
+                <li>
+                    <a class="app-menu__item active" href="index.html">
+                        <i class="app-menu__icon fa fa-dashboard"></i>
+                        <span class="app-menu__label">Tableau de bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="list.html">
+                        <i class="app-menu__icon fa fa-laptop"></i>
+                        <span class="app-menu__label">Projets</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="list.html">
+                        <i class="app-menu__icon fa fa-users"></i>
+                        <span class="app-menu__label">Employés</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="#">
+                        <i class="app-menu__icon fa fa-book"></i>
+                        <span class="app-menu__label">Métiers</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content -->
+        <main class="app-content">
+            <div class="app-title">
+                <div>
+                    <h1>
+                        <i class="fa fa-dashboard"></i>&nbsp;Tableau de bord
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="widget-small info coloured-icon">
+                                <i
+                                    class="icon fa fa-spinner fa-3x"
+                                    aria-hidden="true"></i>
+                                <div class="info">
+                                    <p
+                                        class="text-muted text-sm text-uppercase">
+                                        Projets en cours
+                                    </p>
+                                    <p><strong>11</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="widget-small warning coloured-icon">
+                                <i
+                                    class="icon fa fa-check-square-o fa-3x"
+                                    aria-hidden="true"></i>
+                                <div class="info">
+                                    <p
+                                        class="text-muted text-sm text-uppercase">
+                                        Projets livrés
+                                    </p>
+                                    <p><strong>76</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="widget-small primary coloured-icon">
+                                <i class="icon fa fa-users fa-3x"></i>
+                                <div class="info">
+                                    <p
+                                        class="text-muted text-sm text-uppercase">
+                                        Employés
+                                    </p>
+                                    <p><strong>34</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="widget-small danger coloured-icon">
+                                <i
+                                    class="icon fa fa-calendar-check-o fa-3x"
+                                    aria-hidden="true"></i>
+                                <div class="info">
+                                    <p
+                                        class="text-muted text-sm text-uppercase">
+                                        Jours de production
+                                    </p>
+                                    <p><strong>267</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-uppercase">
+                                <div class="card-header text-center">
+                                    Rentabilité
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">
+                                        <i
+                                            class="fa fa-database mr-2 text-primary"></i>
+                                        70% RENTABLE
+                                    </p>
+                                    <div
+                                        class="embed-responsive embed-responsive-16by9">
+                                        <canvas
+                                            id="ratio-chart"
+                                            class="embed-responsive-item"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-uppercase">
+                                <div class="card-header text-center">
+                                    Taux de livraison
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">
+                                        <i
+                                            class="fa fa fa-check-square-o mr-2 text-primary"></i>
+                                        35% Livrés
+                                    </p>
+                                    <div
+                                        class="embed-responsive embed-responsive-16by9">
+                                        <canvas
+                                            id="delivered-chart"
+                                            class="embed-responsive-item"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div
+                                    class="card-header text-center text-uppercase">
+                                    Top employé
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img
+                                            src="img/ui-zac.jpg"
+                                            class="rounded-circle"
+                                            width="58" />
+                                        <p class="mt-2">
+                                            <strong>Zac Producteur</strong>
+                                        </p>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="small mt">
+                                                EMPLOYÉ DEPUIS
+                                            </p>
+                                            <p>Février 2012</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="small mt">COÛT TOTAL</p>
+                                            <p>34 567 €</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="tile table-responsive">
+                        <h2 class="tile-title">Les derniers projets</h2>
+                        <table class="table table-hover table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Projet</th>
+                                    <th>Date de création</th>
+                                    <th>Prix de vente</th>
+                                    <th>Coût</th>
+                                    <th>Est livré</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        <a href="#">Mon projet</a>
+                                    </th>
+                                    <th>18/03/2018</th>
+                                    <th>20 000 €</th>
+                                    <th>3 200 €</th>
+                                    <th>
+                                        <span class="badge badge-success"
+                                            >OUI</span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <a href="#">Mon projet</a>
+                                    </th>
+                                    <th>18/03/2018</th>
+                                    <th>20 000 €</th>
+                                    <th>3 200 €</th>
+                                    <th>
+                                        <span class="badge badge-success"
+                                            >OUI</span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <a href="#">Mon projet</a>
+                                    </th>
+                                    <th>18/03/2018</th>
+                                    <th>20 000 €</th>
+                                    <th>3 200 €</th>
+                                    <th>
+                                        <span class="badge badge-success"
+                                            >OUI</span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <a href="#">Mon projet</a>
+                                    </th>
+                                    <th>18/03/2018</th>
+                                    <th>20 000 €</th>
+                                    <th>3 200 €</th>
+                                    <th>
+                                        <span class="badge badge-success"
+                                            >OUI</span
+                                        >
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <a href="#">Mon projet</a>
+                                    </th>
+                                    <th>18/03/2018</th>
+                                    <th>20 000 €</th>
+                                    <th>3 200 €</th>
+                                    <th>
+                                        <span class="badge badge-danger"
+                                            >NON</span
+                                        >
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tile">
+                        <h2 class="tile-title text-center">
+                            Temps de production
+                        </h2>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="#">James Brown</a> a travaillé sur
+                                <a href="#">Projet 1</a>
+                                <div class="text-muted font-italic text-right">
+                                    4 jours
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="main-footer">&copy; 2019 - PROCOST</footer>
+
+        <script src="js/pace.min.js"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+            crossorigin="anonymous"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Specific page JS -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"
+            integrity="sha256-oSgtFCCmHWRPQ/JmR4OoZ3Xke1Pw4v50uh6pLcu+fIc="
+            crossorigin="anonymous"></script>
+        <script>
+            var ratioData = [70, 30];
+            var deliveredData = [35, 65];
+        </script>
+        <script src="js/dashboard.js"></script>
+    </body>
+</html>

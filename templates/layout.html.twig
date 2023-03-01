@@ -1,0 +1,23 @@
+{# layout.html. twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {% include 'header.html.twig' %}
+
+    {% include 'sidebar.html.twig' %}
+
+    <main class='app-content'>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

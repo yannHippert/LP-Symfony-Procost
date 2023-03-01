@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Edition d'un employé - PROCOST</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    </head>
+    <body class="app sidebar-mini">
+        <!-- Navbar -->
+        <header class="app-header"><a class="app-header__logo" href="#">Procost</a>
+            <a class="app-sidebar__toggle" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
+            <!-- Navbar Right Menu-->
+            <ul class="app-nav">
+                <li class="app-search">
+                    <a href="login.html" class="btn btn-info">Se déconnecter</a>
+                </li>
+            </ul>
+        </header>
+        <!-- Sidebar menu-->
+        <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+        <aside class="app-sidebar">
+            <div class="app-sidebar__user">
+                <img class="app-sidebar__user-avatar" src="img/user.jpg" alt="User Image">
+                <div>
+                    <p class="app-sidebar__user-name">John Doe</p>
+                    <p class="app-sidebar__user-designation">Manager</p>
+                </div>
+            </div>
+            <ul class="app-menu">
+                <li>
+                    <a class="app-menu__item" href="index.html">
+                        <i class="app-menu__icon fa fa-dashboard"></i>
+                        <span class="app-menu__label">Tableau de bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="list.html">
+                        <i class="app-menu__icon fa fa-laptop"></i>
+                        <span class="app-menu__label">Projets</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item active" href="list.html">
+                        <i class="app-menu__icon fa fa-users"></i>
+                        <span class="app-menu__label">Employés</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="app-menu__item" href="#">
+                        <i class="app-menu__icon fa fa-book"></i>
+                        <span class="app-menu__label">Métiers</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        <main class="app-content">
+            <div class="app-title">
+                <div>
+                    <h1><i class="fa fa-users"></i>&nbsp;Edition d'un employé</h1>
+                </div>
+                <ul class="app-breadcrumb breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="#"><i class="fa fa-home fa-lg"></i></a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#">Employés</a>
+                    </li>
+                    <li class="breadcrumb-item">Edition d'un employé</li>
+                </ul>
+            </div>
+            <div class="tile">
+                    <div class="alert alert-dismissible alert-success my-4">
+                        <button class="close" type="button" data-dismiss="alert">×</button><strong>Well done!</strong> Message flash.
+                    </div>
+                <form class="form-horizontal">
+                    <section>
+                        <h3>Informations générales</h3>
+                        <div class="row mt-4">
+                            <div class="offset-md-4 col-md-8">
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Prénom</label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Nom</label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Email</label>
+                                    <div class="col-md-9">
+                                        <input class="form-control is-invalid" type="email">
+                                        <div class="form-control-feedback text-danger">Un message d'erreur</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr/>
+                    <section>
+                        <h3>Production</h3>
+                        <div class="row mt-4">
+                            <div class="offset-md-4 col-md-8">
+                                <div class="form-group row">
+                                    <label for="select-job" class="control-label col-md-3">Métier</label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" id="select-job">
+                                            <option>Métier 1</option>
+                                            <option>Métier 2</option>
+                                            <option>Métier 3</option>
+                                            <option>Métier 4</option>
+                                            <option>Métier 5</option>
+                                            <option>Métier 6</option>
+                                            <option>Métier 7</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Coût journalier (en €)</label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="number" min="0">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Date d'embauche</label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="date">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <hr/>
+                    <div class="row">
+                        <div class="offset-md-6 col-md-6">
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i>Enregistrer</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            &copy; 2019 - PROCOST
+        </footer>
+
+        <script src="js/pace.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>
