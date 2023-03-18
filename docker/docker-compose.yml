@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+    db:
+        container_name: mysql_docker
+        image: ubuntu/mysql:latest
+        command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server='utf8mb4_0900_ai_ci' --default-time-zone=+00:00
+        environment:
+            MYSQL_ROOT_PASSWORD: <ROOT_PASSWORD>
+            MYSQL_DATABASE: dbProcost
+            MYSQL_USER: AppHandler
+            MYSQL_PASSWORD: AppHandler!23
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+        ports:
+            - '3306:3306'
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        volumes:
+            - './docker-data/db/data:/var/lib/mysql'
+            - './docker-data/db/my.cnf:/etc/mysql/conf.d/my.cnf'
+            - './docker-data/db/sql:/docker-entrypoint-initdb.d'
+        restart: always
