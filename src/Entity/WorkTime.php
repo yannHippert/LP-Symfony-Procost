@@ -78,9 +78,9 @@ class WorkTime
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = new \DateTimeImmutable($createdAt->format("Y-M-d H:m:s"));
 
         return $this;
     }

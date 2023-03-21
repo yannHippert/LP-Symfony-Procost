@@ -26,28 +26,32 @@
             <table class="table table-striped table-bordered table-sm">
                 <tbody>
                     <tr>
-                        <th>Name</td>
-                        <td>{{ project.firstName }}</td>
+                        <th>Name</th>
+                        <td>{{ project.name }}</td>
                     </tr>
                     <tr>
-                        <th>Description</td>
+                        <th>Description</th>
                         <td>{{ project.description }}</td>
                     </tr>
                     <tr>
-                        <th>Prix de vente</td>
-                        <td>{{ project.price }}</td>
+                        <th>Prix de vente</th>
+                        <td>{{ project.price|format_currency('EUR') }}</td>
                     </tr>
                     <tr>
-                        <th>Prix actuelle</td>
-                        <td>{{ project.currentPrice }}</td>
+                        <th>Prix actuelle</th>
+                        <td class={{ project.price < currentPrice ? "text-danger" }}>{{ currentPrice|format_currency('EUR') }}</td>
                     </tr>
                     <tr>
-                        <th>Date de création</td>
+                        <th>Nombre d'employés ayant travaillé</th>
+                        <td>{{ employeeCount }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de création</th>
                         <td>{{ project.createdAt|date("d M Y") }}</td>
                     </tr>
                     {% if project.deliveredAt %}
                         <tr>
-                            <th>Date de livraison</td>
+                            <th>Date de livraison</th>
                             <td>{{ project.deliveredAt|date("d M Y")}}</td>
                         </tr>
                     {% endif %}
@@ -105,10 +109,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for work_time in work_times %}
+                        {% for work_time in project.workTimes %}
                             <tr>
                                 <td>{{ work_time.employee.fullName }}</td>
-                                <td>{{ work_time.spentTime }} jours</td>
+                                <td>{{ work_time.daysSpent }} jours</td>
                                 <td>{{ work_time.createdat|date("d-m-Y") }}</td>
                                 <td>{{ work_time.totalPrice|format_currency('EUR') }}</td>
                             </tr>

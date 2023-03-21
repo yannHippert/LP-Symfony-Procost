@@ -23,6 +23,7 @@ services:
       - '../src/Kernel.php'
 
   App\Factory\Employee\EmployeeFactoryInterface: '@App\Factory\Employee\DefaultEmployeeFactory'
+  App\Factory\Project\ProjectFactoryInterface: '@App\Factory\Project\DefaultProjectFactory'
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

@@ -26,7 +26,7 @@ class EmployeeController extends AbstractController
         private EmployeeManager $employeeManager,
     ) {}
 
-    #[Route('/employee/{id}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
+    #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
     public function details(int $id, int $page = 1): Response
     {
         try {

@@ -4,7 +4,9 @@ namespace App\DataFixtures;
 
 use App\Entity\Employee;
 use App\Entity\Profession;
+use App\Entity\WorkTime;
 use App\Factory\Employee\EmployeeFactoryInterface;
+use App\Factory\Project\ProjectFactoryInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -14,12 +16,14 @@ class AppFixtures extends Fixture
 {
     public const PROFESSION_COUNT = 6;
     public const EMPLOYEE_COUNT = 32;
+    public const PROJECT_COUNT = 72;
 
     private $manager;
     private $faker;
 
     public function __construct(
         private EmployeeFactoryInterface $employeeFactory,
+        private ProjectFactoryInterface $projectFactory,
     ){}
 
     public function load(ObjectManager $manager): void
@@ -29,6 +33,7 @@ class AppFixtures extends Fixture
 
         $this->loadProfessions();
         $this->loadEmployees();
+        $this->loadProjects();
 
         $this->manager->flush();
     }
@@ -51,6 +56,29 @@ class AppFixtures extends Fixture
 
             $this->manager->persist($employee);
             $this->addReference(Employee::class . $i, $employee);
+        }
+    }
+
+    private function loadProjects(): void
+    {
+        for($i = 0; $i < self::PROJECT_COUNT;  $i++) {
+            $project = $this->projectFactory->createProject();
+            $target = mt_rand(0, $project->getPrice() + 10000);
+            $sum = 0;
+            while($sum <= $target) {
+                $worktime = new WorkTime();
+                $worktime->setProject($project);
+                $worktime->setEmployee($this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1)));
+                $worktime->setDaysSpent($this->faker->randomDigitNotZero());
+                $lowerDate = $project->getCreatedAt()->format("Y-M-d H:m:s");
+                $upperDate = min(intval($project->getCreatedAt()->format("Y") + 2), (new \DateTime())->format("Y")) . $project->getCreatedAt()->format("-M-d H:m:s");
+                $worktime->setCreatedAt($this->faker->dateTimeBetween($lowerDate, $upperDate));
+                $sum += $worktime->getTotalPrice();
+                $this->manager->persist($worktime);
+            }
+
+            $this->manager->persist($project);
+            $this->addReference(Project::class . $i, $project);
         }
     }
 }

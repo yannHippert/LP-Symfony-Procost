@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Project;
+use App\Entity\WorkTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,6 +41,22 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
+    public function getById(int $id, int $page): Project
+    {
+        return $this->createQueryBuilder('p')
+            ->addSelect('w')
+            ->addSelect('e')
+            ->leftJoin('p.workTimes', 'w')
+            ->leftJoin('w.employee', 'e')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->orderBy('w.createdAt', 'DESC')
+            ->setMaxResults(WorkTime::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * WorkTime::PAGE_SIZE)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
     public function findOpen(): array 
     {
         $qb = $this->createQueryBuilder('p')
@@ -52,14 +70,53 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function getPage(int $page): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->orderBy('p.createdAt', 'ASC')
+        $ids = $this->_em->createQueryBuilder()
+            ->select('p.id')
+            ->from(Project::class, 'p')
+            ->orderBy('p.createdAt', 'DESC')
             ->setMaxResults(Project::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * Project::PAGE_SIZE);
-
-        return $qb
+            ->setFirstResult(($page - 1) * Project::PAGE_SIZE)
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
+    
+        $qb = $this->createQueryBuilder('p')
+            ->addSelect("w")
+            ->addSelect("e")
+            ->leftJoin('p.workTimes', 'w')
+            ->leftJoin('w.employee', 'e')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('p.createdAt', 'DESC');
+    
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countEmployeesOfProject(int $projectId): int
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('count(distinct w.employee)')
+            ->from(WorkTime::class, 'w')
+            ->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countWorkTimesOfProject(int $projectId): int
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('count(w)')
+            ->from(WorkTime::class, 'w')
+            ->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function addWhereProjectClause(QueryBuilder $qb, int $projectId): void
+    {
+        $qb->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId);
     }
 
 //    /**

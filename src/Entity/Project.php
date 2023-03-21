@@ -87,9 +87,9 @@ class Project
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = new \DateTimeImmutable($createdAt->format("Y-M-d H:m:s"));
 
         return $this;
     }
@@ -99,9 +99,9 @@ class Project
         return $this->deliveredAt;
     }
 
-    public function setDeliveredAt(?\DateTimeImmutable $deliveredAt): self
+    public function setDeliveredAt(?\DateTime $deliveredAt): self
     {
-        $this->deliveredAt = $deliveredAt;
+        $this->deliveredAt = new \DateTimeImmutable($deliveredAt->format("Y-M-d H:m:s"));
 
         return $this;
     }

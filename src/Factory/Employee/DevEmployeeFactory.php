@@ -19,7 +19,7 @@ class DevEmployeeFactory implements EmployeeFactoryInterface
             ->setLastName($faker->lastName())
             ->setEmail($faker->email())
             ->setDailySalary(mt_rand(10, 100) * 10)
-            ->setEmploymentDate($faker->dateTimeBetween('-25 year', 'now'));
+            ->setEmploymentDate($faker->dateTimeBetween('-10 year', 'now'));
 
         return $employee;
     }

@@ -59,9 +59,20 @@ class WorkTimeRepository extends ServiceEntityRepository
             ->leftJoin('w.employee', 'e')
             ->where('w.employee = :employeeId')
             ->setParameter('employeeId', $employeeId)
-            ->orderBy('w.createdAt', 'ASC')
+            ->orderBy('w.createdAt', 'DESC')
             ->setMaxResults(WorkTime::PAGE_SIZE)
             ->setFirstResult(($page - 1) * WorkTime::PAGE_SIZE)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOfProject(int $projectId): array
+    {
+        return $this->createQueryBuilder('w')
+            ->addSelect('e')
+            ->leftJoin('w.employee', 'e')
+            ->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId)
             ->getQuery()
             ->getResult();
     }

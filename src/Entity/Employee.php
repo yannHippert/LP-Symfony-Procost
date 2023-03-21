@@ -130,7 +130,6 @@ class Employee
     public function setEmploymentDate(\DateTime $employmentDate): self
     {
         $this->employmentDate = new \DateTimeImmutable($employmentDate->format("Y-M-d H:m:s"));
-        // $this->employmentDate = $employmentDate; 
 
         return $this;
     }
