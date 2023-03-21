@@ -39,6 +39,33 @@ class WorkTimeRepository extends ServiceEntityRepository
         }
     }
 
+    public function countOfEmployee(int $employeeId): int
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('count(w.id)')
+            ->from(WorkTime::class, 'w')
+            ->where('w.employee = :employeeId')
+            ->setParameter('employeeId', $employeeId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findByEmployeeId(int $employeeId, int $page = 1): array
+    {
+        return $this->createQueryBuilder('w')
+            ->addSelect('p')
+            ->addSelect('e')
+            ->leftJoin('w.project', 'p')
+            ->leftJoin('w.employee', 'e')
+            ->where('w.employee = :employeeId')
+            ->setParameter('employeeId', $employeeId)
+            ->orderBy('w.createdAt', 'ASC')
+            ->setMaxResults(WorkTime::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * WorkTime::PAGE_SIZE)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return WorkTime[] Returns an array of WorkTime objects
 //     */

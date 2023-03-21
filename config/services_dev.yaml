@@ -1,0 +1,2 @@
+services:
+  App\Factory\Employee\EmployeeFactoryInterface: '@App\Factory\Employee\DevEmployeeFactory'

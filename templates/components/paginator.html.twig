@@ -1,0 +1,39 @@
+{% set id = id ?? null %}
+{% set current_path = app.request.get('_route') %}
+
+<nav class="float-right">
+    <ul class="pagination">
+        {% if pagination.current == 1 %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        {% else %} 
+            <li class="page-item">
+                <a class="page-link" href={{ path(current_path, {page: pagination.current - 1, id: id}) }}>&laquo;</a>
+            </li>
+        {% endif %}
+
+        {% for i in 1..pagination.total %}
+            {% if pagination.current == i %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ i }}<span class="sr-only">(current)</span></span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href={{ path(current_path, {page: i, id: id}) }}>{{ i }}</a></li>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+
+        {% if pagination.current == pagination.total %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% else %} 
+            <li class="page-item">
+                <a class="page-link" href={{ path(current_path, {page: pagination.current + 1, id: id}) }}>&raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

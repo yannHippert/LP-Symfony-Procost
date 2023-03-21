@@ -1,0 +1,56 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Employees - {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-users"></i>&nbsp;Employés</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#"><i class="fa fa-home fa-lg"></i></a>
+        </li>
+        <li class="breadcrumb-item">Employés</li>
+    </ul>
+</div>
+<div class="tile pb-5">
+    <a href={{ path('employee_create') }} class="btn btn-primary float-right mb-4"><i class="fa fa-plus-circle mr-2"></i>Ajouter un employé</a>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Métier</th>
+                    <th>Coût journalier</th>
+                    <th>Date d'embauche</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.fullName }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.profession.name }}</td>
+                        <td>{{ employee.dailySalary|format_currency('EUR') }}</td>
+                        <td>{{ employee.employmentDate|date("m/Y", "Europe/Paris") }}</td>
+                        <td>
+                            <a href={{ path('employee_details', { id: employee.id }) }} class="btn btn-primary btn-sm">
+                                <i class="fa fa-eye mr-0"></i>
+                            </a>
+                            <a href={{ path("employee_update", { id: employee.id }) }} class="btn btn-info btn-sm">
+                                <i class="fa fa-pencil mr-0"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr/>
+
+    {% include "components/paginator.html.twig" %} 
+</div>
+{% endblock %}

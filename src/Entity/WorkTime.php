@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WorkTimeRepository::class)]
 class WorkTime
 {
+    public const PAGE_SIZE = 10;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,6 +20,9 @@ class WorkTime
 
     #[ORM\ManyToOne(inversedBy: 'workTimes')]
     private ?Project $project = null;
+
+    #[ORM\Column]
+    private int $daysSpent;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -49,6 +54,23 @@ class WorkTime
         $this->project = $project;
 
         return $this;
+    }
+
+    public function getDaysSpent(): ?int
+    {
+        return $this->daysSpent;
+    }
+
+    public function setDaysSpent(?int $daysSpent): self
+    {
+        $this->daysSpent = $daysSpent;
+
+        return $this;
+    }
+
+    public function getTotalPrice(): float
+    {
+        return $this->daysSpent * $this->employee->getDailySalary();
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

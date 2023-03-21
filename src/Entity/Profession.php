@@ -21,8 +21,10 @@ class Profession
     #[ORM\OneToMany(mappedBy: 'profession', targetEntity: Employee::class)]
     private Collection $employees;
 
-    public function __construct()
-    {
+    public function __construct(
+        string $name
+    ) {
+        $this->name = $name;
         $this->employees = new ArrayCollection();
     }
 

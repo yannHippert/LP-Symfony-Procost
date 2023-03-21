@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Employee;
+use App\Entity\WorkTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,6 +38,40 @@ class EmployeeRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    // public function count(): int
+    // {
+    //     return $this->_em->createQueryBuilder()
+    //         ->select('count(e.id)')
+    //         ->from(Employee::class, 'e')
+    //         ->getQuery()
+    //         ->getSingleScalarResult();
+    // }
+
+    public function getPage(int $page): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->orderBy('e.id', 'ASC')
+            ->addSelect('p')
+            ->leftJoin('e.profession', 'p')
+            ->setMaxResults(Employee::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * Employee::PAGE_SIZE);
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getById(int $id): Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->addSelect('p')
+            ->leftJoin('e.profession', 'p')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleResult();
     }
 
 //    /**

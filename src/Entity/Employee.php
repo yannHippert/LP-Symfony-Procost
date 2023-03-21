@@ -7,22 +7,31 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
 {
+    public const PAGE_SIZE = 10;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Length(min: 2, minMessage: 'Le prénom doit contenir au minimum {{ limit }} caractères !')]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Length(min: 2, minMessage: 'Le nom doit contenir au minimum {{ limit }} caractères !')]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Email(message: 'L\'email {{ value }} n\'est pas valide !')]
     private ?string $email = null;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
@@ -30,15 +39,20 @@ class Employee
     private ?Profession $profession = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Positive(message: 'Le salaire journalier ne peux pas être negatif !')]
     private ?float $dailySalary = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Type("\DateTimeInterface", message: 'Ce champ doit être une date !')]
+    #[Assert\LessThanOrEqual('today', message: "La date d'embauche ne peux pas être supérieur à la date actuelle !")]
     private ?\DateTimeImmutable $employmentDate = null;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: WorkTime::class)]
     private Collection $workTimes;
 
-    public function __construct()
+    public function __construct() 
     {
         $this->workTimes = new ArrayCollection();
     }
@@ -113,9 +127,10 @@ class Employee
         return $this->employmentDate;
     }
 
-    public function setEmploymentDate(\DateTimeImmutable $employmentDate): self
+    public function setEmploymentDate(\DateTime $employmentDate): self
     {
-        $this->employmentDate = $employmentDate;
+        $this->employmentDate = new \DateTimeImmutable($employmentDate->format("Y-M-d H:m:s"));
+        // $this->employmentDate = $employmentDate; 
 
         return $this;
     }
@@ -148,5 +163,10 @@ class Employee
         }
 
         return $this;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->firstName . " " . strtoupper($this->lastName);
     }
 }

@@ -39,6 +39,29 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOpen(): array 
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.name', 'ASC');
+            //->where('p.deliveredAt' < now())
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getPage(int $page): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'ASC')
+            ->setMaxResults(Project::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * Project::PAGE_SIZE);
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Project[] Returns an array of Project objects
 //     */
