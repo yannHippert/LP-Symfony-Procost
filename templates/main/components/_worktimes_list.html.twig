@@ -1,0 +1,16 @@
+<div class="tile">
+    <h2 class="tile-title text-center">
+        {{ title ?? "Temps de production" }}
+    </h2>
+    <ul class="list-group">
+        {% for worktime in worktimes %}
+            <li class="list-group-item">
+                <a href={{ path("employee_details", { id: worktime.employee.id }) }}>{{ worktime.employee.fullName }}</a> a travaillé sur
+                <a href={{ path("project_details", { id: worktime.project.id }) }}>{{ worktime.project.name }}</a>
+                <div class="text-muted font-italic text-right">
+                    {{ worktime.daysSpent }} jours
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

@@ -14,49 +14,36 @@
     <div class="col-md-9">
         <div class="row">
             <div class="col-md-6">
-                <div class="widget-small info coloured-icon">
-                    <i class="icon fa fa-spinner fa-3x" aria-hidden="true"></i>
-                    <div class="info">
-                        <p class="text-muted text-sm text-uppercase">
-                            Projets en cours
-                        </p>
-                        <p><strong>{{ open_projects }}</strong></p>
-                    </div>
-                </div>
+                {% include "main/components/data_card.html.twig" with {
+                    color: "info",
+                    icon: "fa-spinner",
+                    title: "Projets en cours",
+                    value: open_projects
+                } %}
             </div>
             <div class="col-md-6">
-                <div class="widget-small warning coloured-icon">
-                    <i class="icon fa fa-check-square-o fa-3x"
-                        aria-hidden="true"></i>
-                    <div class="info">
-                        <p class="text-muted text-sm text-uppercase">
-                            Projets livrés
-                        </p>
-                        <p><strong>{{ delivered_projects }}</strong></p>
-                    </div>
-                </div>
+                {% include "main/components/data_card.html.twig" with {
+                    color: "warning",
+                    icon: "fa-check-square-o",
+                    title: "Projets livrés",
+                    value: delivered_projects
+                } %}
             </div>
             <div class="col-md-6">
-                <div class="widget-small primary coloured-icon">
-                    <i class="icon fa fa-users fa-3x"></i>
-                    <div class="info">
-                        <p class="text-muted text-sm text-uppercase">
-                            Employés
-                        </p>
-                        <p><strong>{{ employee_count }}</strong></p>
-                    </div>
-                </div>
+                {% include "main/components/data_card.html.twig" with {
+                    color: "primary",
+                    icon: "fa-users",
+                    title: "Employés",
+                    value: employee_count
+                } %}
             </div>
             <div class="col-md-6">
-                <div class="widget-small danger coloured-icon">
-                    <i class="icon fa fa-calendar-check-o fa-3x" aria-hidden="true"></i>
-                    <div class="info">
-                        <p class="text-muted text-sm text-uppercase">
-                            Jours de production
-                        </p>
-                        <p><strong>{{ production_time }}</strong></p>
-                    </div>
-                </div>
+                {% include "main/components/data_card.html.twig" with {
+                    color: "danger",
+                    icon: "fa-calendar-check-o",
+                    title: "Jours de production",
+                    value: production_time
+                } %}
             </div>
         </div>
         <div class="row">
@@ -97,88 +84,17 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header text-center text-uppercase">
-                        Top employé
-                    </div>
-                    <div class="card-body">
-                        <div class="text-center">
-                            <img
-                                src="img/ui-zac.jpg"
-                                class="rounded-circle"
-                                width="58" />
-                            <p class="mt-2">
-                                <strong>{{ best_employee.fullName }}</strong>
-                            </p>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="small mt">
-                                    EMPLOYÉ DEPUIS
-                                </p>
-                                <p>{{ best_employee.employmentDate|date("M Y") }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="small mt">COÛT TOTAL</p>
-                                <p>{{ best_employee.totalCost|format_currency('EUR') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {{ render(controller('App\\Controller\\MainController::bestEmployeeCard')) }}
             </div>
         </div>
+
         <hr />
-        <div class="tile table-responsive">
-            <h2 class="tile-title">Les derniers projets</h2>
-            <table class="table table-hover table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>Projet</th>
-                        <th>Date de création</th>
-                        <th>Prix de vente</th>
-                        <th>Coût</th>
-                        <th>Est livré</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for project in latest_projects %}
-                        <tr>
-                            <td>
-                                <a href={{ path("project_details", { id: project.id })}}>{{ project.name }}</a>
-                            </td>
-                            <td>{{ project.createdAt|date("d/M/Y") }}</td>
-                            <td>{{ project.price|format_currency('EUR') }}</td>
-                            <td>{{ project.productionCost|format_currency('EUR') }}</td>
-                            <td>
-                                {{ 
-                                    project.deliveredAt is null
-                                    ? '<span class="badge badge-danger">NON</span>'
-                                    : '<span class="badge badge-success">OUI</span>'
-                                }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+        {{ render(controller('App\\Controller\\MainController::latestProjectsTable')) }}
     </div>
+
     <div class="col-md-3">
-        <div class="tile">
-            <h2 class="tile-title text-center">
-                Temps de production
-            </h2>
-            <ul class="list-group">
-                {% for worktime in latest_worktimes %}
-                    <li class="list-group-item">
-                        <a href={{ path("employee_details", { id: worktime.employee.id }) }}>{{ worktime.employee.fullName }}</a> a travaillé sur
-                        <a href={{ path("project_details", { id: worktime.project.id }) }}>{{ worktime.project.name }}</a>
-                        <div class="text-muted font-italic text-right">
-                            {{ worktime.daysSpent }} jours
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        {{ render(controller('App\\Controller\\MainController::latestWorktimesList')) }}
     </div>
 </div>
 {% endblock %}

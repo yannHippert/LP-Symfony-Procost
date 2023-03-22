@@ -1,0 +1,33 @@
+<div class="tile table-responsive">
+    <h2 class="tile-title">{{ title ?? "Projets" }}</h2>
+    <table class="table table-hover table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Projet</th>
+                <th>Date de création</th>
+                <th>Prix de vente</th>
+                <th>Coût</th>
+                <th>Est livré</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+                <tr>
+                    <td>
+                        <a href={{ path("project_details", { id: project.id })}}>{{ project.name }}</a>
+                    </td>
+                    <td>{{ project.createdAt|date("d/M/Y") }}</td>
+                    <td>{{ project.price|format_currency('EUR') }}</td>
+                    <td>{{ project.productionCost|format_currency('EUR') }}</td>
+                    <td>
+                        {{ 
+                            project.deliveredAt is null
+                            ? '<span class="badge badge-danger">NON</span>'
+                            : '<span class="badge badge-success">OUI</span>'
+                        }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
