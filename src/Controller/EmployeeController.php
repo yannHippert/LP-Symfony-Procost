@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\WorkTime;
 use App\EventManager\EmployeeManager;
+use App\EventManager\WorkTimeManager;
 use App\Factory\Employee\EmployeeFactoryInterface;
+use App\Form\Data\WorkTimeData;
 use App\Form\EmployeeType;
+use App\Form\WorkTimeDataType;
 use App\Repository\EmployeeRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\WorkTimeRepository;
@@ -24,15 +27,26 @@ class EmployeeController extends AbstractController
         private WorkTimeRepository $workTimeRepository,
         private EmployeeFactoryInterface $employeeFactory,
         private EmployeeManager $employeeManager,
+        private WorkTimeManager $workTimeManager
     ) {}
 
-    #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
-    public function details(int $id, int $page = 1): Response
+    #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
+    public function details(Request $request, int $id, int $page = 1): Response
     {
         try {
             $employee = $this->employeeRepository->getById($id);
         } catch(UnexpectedResultException) {
             throw new NotFoundHttpException();
+        }
+        
+        $workTimeData = new WorkTimeData();
+        $form = $this->createForm(WorkTimeDataType::class, $workTimeData);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()) {
+            $this->workTimeManager->addWorkTime($workTimeData, $employee);
+
+            return $this->redirectToRoute('employee_details', ['id' => $id, 'page' => $page]);
         }
 
         $totalWorkTimes = $this->workTimeRepository->countOfEmployee($id);
@@ -40,6 +54,7 @@ class EmployeeController extends AbstractController
 
         return $this->render('employee/details.html.twig', [
             "employee" => $employee,
+            "form" => $form,
             "work_times" => $workTimes,
             'pagination' => [
                 'current' => $page,

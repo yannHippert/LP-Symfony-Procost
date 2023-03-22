@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\Data\WorkTimeData;
 use App\Repository\WorkTimeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,16 +17,26 @@ class WorkTime
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'workTimes')]
-    private ?Employee $employee = null;
+    private Employee $employee;
 
     #[ORM\ManyToOne(inversedBy: 'workTimes')]
-    private ?Project $project = null;
+    private Project $project;
 
     #[ORM\Column]
     private int $daysSpent;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct(
+        WorkTimeData $workTimeData,
+        Employee $employee
+    ) {
+        $this->daysSpent = $workTimeData->getDaysSpent();
+        $this->project = $workTimeData->getProject();
+        $this->employee = $employee;
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {

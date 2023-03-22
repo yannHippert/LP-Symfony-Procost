@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Event\EmployeeCreated;
 use App\Event\EmployeeUpdated;
+use App\Event\WorkTimeCreated;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,6 +24,9 @@ final class FlashSubscriber implements EventSubscriberInterface
             ],
             EmployeeUpdated::class => [
                 ["onEmployeeUpdated"]
+            ],
+            WorkTimeCreated::class => [
+                ["onWorkTimeCreated"]
             ]
         ];
     }
@@ -35,6 +39,12 @@ final class FlashSubscriber implements EventSubscriberInterface
     public function onEmployeeUpdated(EmployeeUpdated $payload): void 
     {
         $this->addFlash('success', "L'employé {$payload->getEmployee()->getFullName()} a été modifié !");
+    }
+
+    public function onWorkTimeCreated(WorkTimeCreated $payload): void 
+    {
+        $worktime = $payload->getWorkTime();
+        $this->addFlash('success', "Temps de production de {$worktime->getDaysSpent()} jours ajouté pour {$worktime->getEmployee()->getFullName()} sur le projet {$worktime->getProject()->getName()} !");
     }
 
     private function addFlash(String $flashType, String $flashMessage)
