@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<WorkTime>
+ * @extends ServiceEntityRepository<Worktime>
  *
- * @method WorkTime|null find($id, $lockMode = null, $lockVersion = null)
- * @method WorkTime|null findOneBy(array $criteria, array $orderBy = null)
- * @method WorkTime[]    findAll()
- * @method WorkTime[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Worktime|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Worktime|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Worktime[]    findAll()
+ * @method Worktime[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class WorkTimeRepository extends ServiceEntityRepository
+class WorktimeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, WorkTime::class);
+        parent::__construct($registry, Worktime::class);
     }
 
-    public function save(WorkTime $entity, bool $flush = false): void
+    public function save(Worktime $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -31,7 +31,7 @@ class WorkTimeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(WorkTime $entity, bool $flush = false): void
+    public function remove(Worktime $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -44,7 +44,7 @@ class WorkTimeRepository extends ServiceEntityRepository
     {
         return $this->_em->createQueryBuilder()
             ->select('count(w.id)')
-            ->from(WorkTime::class, 'w')
+            ->from(Worktime::class, 'w')
             ->where('w.employee = :employeeId')
             ->setParameter('employeeId', $employeeId)
             ->getQuery()
@@ -61,21 +61,52 @@ class WorkTimeRepository extends ServiceEntityRepository
             ->where('w.employee = :employeeId')
             ->setParameter('employeeId', $employeeId)
             ->orderBy('w.createdAt', 'DESC')
-            ->setMaxResults(WorkTime::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * WorkTime::PAGE_SIZE)
+            ->setMaxResults(Worktime::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * Worktime::PAGE_SIZE)
             ->getQuery()
             ->getResult();
     }
 
-    public function getOfProject(int $projectId): array
+    public function getOfEmployee(int $employeeId, int $page = null): array
     {
-        return $this->createQueryBuilder('w')
+        $qb = $this->createQueryBuilder('w')
+            ->addSelect('p')
             ->addSelect('e')
+            ->leftJoin('w.project', 'p')
             ->leftJoin('w.employee', 'e')
+            ->orderBy('w.createdAt', 'DESC');
+            
+        $this->addWhereEmployee($qb, $employeeId);
+        $this->addPagination($qb, $page);
+
+        return $qb 
+                ->getQuery()
+                ->getResult();
+    }
+
+    public function getOfProject(int $projectId, int $page = null): array
+    {
+        $qb = $this->createQueryBuilder('w')
+            ->addSelect('e')
+            ->leftJoin('w.employee', 'e');
+
+        $this->addWhereProject($qb, $projectId);
+        $this->addPagination($qb, $page);
+
+        return $qb 
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countOfProject(int $projectId): int
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('count(w.id)')
+            ->from(Worktime::class, 'w')
             ->where('w.project = :projectId')
             ->setParameter('projectId', $projectId)
             ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult();
     }
 
     public function getLatest(int $resultCount = 6): array
@@ -91,28 +122,27 @@ class WorkTimeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-//    /**
-//     * @return WorkTime[] Returns an array of WorkTime objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('w')
-//            ->andWhere('w.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('w.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    private function addPagination(QueryBuilder $qb, ?int $page): void
+    {
+        if($page != null) {
+            $qb
+                ->setMaxResults(Worktime::PAGE_SIZE)
+                ->setFirstResult(($page - 1) * Worktime::PAGE_SIZE);
+        }
+    }
 
-//    public function findOneBySomeField($value): ?WorkTime
-//    {
-//        return $this->createQueryBuilder('w')
-//            ->andWhere('w.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    private function addWhereProject(QueryBuilder $qb, int $projectId): void
+    {
+        $qb
+            ->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId);
+    }
+
+    private function addWhereEmployee(QueryBuilder $qb, int $employeeId): void
+    {
+        $qb
+            ->where('w.employee = :employeeId')
+            ->setParameter('employeeId', $employeeId);
+    }
+
 }

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Form\Data\WorkTimeData;
-use App\Repository\WorkTimeRepository;
+use App\Form\Data\WorktimeData;
+use App\Repository\WorktimeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: WorkTimeRepository::class)]
-class WorkTime
+#[ORM\Entity(repositoryClass: WorktimeRepository::class)]
+class Worktime
 {
     public const PAGE_SIZE = 10;
 
@@ -16,10 +16,10 @@ class WorkTime
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'workTimes')]
+    #[ORM\ManyToOne(inversedBy: 'worktimes')]
     private Employee $employee;
 
-    #[ORM\ManyToOne(inversedBy: 'workTimes')]
+    #[ORM\ManyToOne(inversedBy: 'worktimes')]
     private Project $project;
 
     #[ORM\Column]
@@ -29,11 +29,11 @@ class WorkTime
     private \DateTimeImmutable $createdAt;
 
     public function __construct(
-        WorkTimeData $workTimeData,
+        WorktimeData $worktimeData,
         Employee $employee
     ) {
-        $this->daysSpent = $workTimeData->getDaysSpent();
-        $this->project = $workTimeData->getProject();
+        $this->daysSpent = $worktimeData->getDaysSpent();
+        $this->project = $worktimeData->getProject();
         $this->employee = $employee;
         $this->createdAt = new \DateTimeImmutable();
     }

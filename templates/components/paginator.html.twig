@@ -1,5 +1,5 @@
 {% set id = id ?? null %}
-{% set current_path = app.request.get('_route') %}
+{% set current_path = app.request.get('_route') ?? route %}
 
 <nav class="float-right">
     <ul class="pagination">

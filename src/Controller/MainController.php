@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\Repository\EmployeeRepository;
 use App\Repository\ProjectRepository;
-use App\Repository\WorkTimeRepository;
+use App\Repository\WorktimeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +16,7 @@ final class MainController extends AbstractController
     public function __construct(
         private ProjectRepository $projectRepository,
         private EmployeeRepository $employeeRepository,
-        private WorkTimeRepository $workTimeRepository
+        private WorktimeRepository $workTimeRepository
     ) {}
 
     #[Route('/', name: 'main_dashboard', methods: 'GET')]

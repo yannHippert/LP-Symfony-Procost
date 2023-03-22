@@ -50,11 +50,11 @@ class Employee
     private ?\DateTimeImmutable $employmentDate = null;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: WorkTime::class)]
-    private Collection $workTimes;
+    private Collection $worktimes;
 
     public function __construct() 
     {
-        $this->workTimes = new ArrayCollection();
+        $this->worktimes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -137,15 +137,15 @@ class Employee
     /**
      * @return Collection<int, WorkTime>
      */
-    public function getWorkTimes(): Collection
+    public function getworktimes(): Collection
     {
-        return $this->workTimes;
+        return $this->worktimes;
     }
 
     public function addWorkTime(WorkTime $workTime): self
     {
-        if (!$this->workTimes->contains($workTime)) {
-            $this->workTimes->add($workTime);
+        if (!$this->worktimes->contains($workTime)) {
+            $this->worktimes->add($workTime);
             $workTime->setEmployee($this);
         }
 
@@ -154,7 +154,7 @@ class Employee
 
     public function removeWorkTime(WorkTime $workTime): self
     {
-        if ($this->workTimes->removeElement($workTime)) {
+        if ($this->worktimes->removeElement($workTime)) {
             // set the owning side to null (unless already changed)
             if ($workTime->getEmployee() === $this) {
                 $workTime->setEmployee(null);

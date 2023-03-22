@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Project;
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 use App\Repository\ProjectRepository;
-use App\Repository\WorkTimeRepository;
+use App\Repository\WorktimeRepository;
 use Doctrine\ORM\UnexpectedResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +16,11 @@ class ProjectController extends AbstractController
 {
     public function __construct(
         private ProjectRepository $projectRepository,
-        private WorkTimeRepository $workTimeRepository
+        private WorktimeRepository $workTimeRepository
     ) {}
 
     #[Route('/project/{id}/{page}', name: 'project_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
-    public function index(int $id, int $page = 1): Response
+    public function details(int $id, int $page = 1): Response
     {
         try {
             $project = $this->projectRepository->getById($id, $page);
@@ -29,20 +29,10 @@ class ProjectController extends AbstractController
         }
 
         $employeeCount = $this->projectRepository->countEmployeesOfProject($id);
-        $worktimes = $this->workTimeRepository->getOfProject($id);
-        $currentPrice = 0;
-        foreach ($worktimes as $worktime) {
-            $currentPrice += $worktime->getTotalPrice();
-        }
 
         return $this->render('project/details.html.twig', [
             "project" => $project,
-            "employeeCount" => $employeeCount,
-            "currentPrice" => $currentPrice,
-            'pagination' => [
-                'current' => $page,
-                'total' => max(1, ceil(count($worktimes) / WorkTime::PAGE_SIZE))
-            ]
+            "employeeCount" => $employeeCount
         ]);
     }
 

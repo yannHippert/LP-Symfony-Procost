@@ -3,26 +3,26 @@
 namespace App\EventManager;
 
 use App\Entity\Employee;
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 use App\Event\EmployeeCreated;
-use App\Event\WorkTimeCreated;
-use App\Form\Data\WorkTimeData;
-use App\Repository\WorkTimeRepository;
+use App\Event\WorktimeCreated;
+use App\Form\Data\WorktimeData;
+use App\Repository\WorktimeRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-final class WorkTimeManager
+final class WorktimeManager
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-        private WorkTimeRepository $workTimeRepository,
+        private WorktimeRepository $workTimeRepository,
     ) {}
 
-    public function addWorkTime(WorkTimeData $worktimeData, Employee $employee): void
+    public function addWorktime(WorktimeData $worktimeData, Employee $employee): void
     {
-        $worktime = new WorkTime($worktimeData, $employee);
+        $worktime = new Worktime($worktimeData, $employee);
 
         $this->workTimeRepository->save($worktime, true);
 
-        $this->eventDispatcher->dispatch(new WorkTimeCreated($worktime));
+        $this->eventDispatcher->dispatch(new WorktimeCreated($worktime));
     }
 }

@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 use App\EventManager\EmployeeManager;
-use App\EventManager\WorkTimeManager;
+use App\EventManager\WorktimeManager;
 use App\Factory\Employee\EmployeeFactoryInterface;
-use App\Form\Data\WorkTimeData;
+use App\Form\Data\WorktimeData;
 use App\Form\EmployeeType;
-use App\Form\WorkTimeDataType;
+use App\Form\WorktimeDataType;
 use App\Repository\EmployeeRepository;
 use App\Repository\ProjectRepository;
-use App\Repository\WorkTimeRepository;
+use App\Repository\WorktimeRepository;
 use Doctrine\ORM\UnexpectedResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,10 +24,10 @@ class EmployeeController extends AbstractController
     public function __construct(
         private EmployeeRepository $employeeRepository,
         private ProjectRepository $projectRepository,
-        private WorkTimeRepository $workTimeRepository,
+        private WorktimeRepository $workTimeRepository,
         private EmployeeFactoryInterface $employeeFactory,
         private EmployeeManager $employeeManager,
-        private WorkTimeManager $workTimeManager
+        private WorktimeManager $workTimeManager
     ) {}
 
     #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
@@ -39,27 +39,19 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException();
         }
         
-        $workTimeData = new WorkTimeData();
-        $form = $this->createForm(WorkTimeDataType::class, $workTimeData);
+        $workTimeData = new WorktimeData();
+        $form = $this->createForm(WorktimeDataType::class, $workTimeData);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
-            $this->workTimeManager->addWorkTime($workTimeData, $employee);
+            $this->workTimeManager->addWorktime($workTimeData, $employee);
 
             return $this->redirectToRoute('employee_details', ['id' => $id, 'page' => $page]);
         }
 
-        $totalWorkTimes = $this->workTimeRepository->countOfEmployee($id);
-        $workTimes = $this->workTimeRepository->findByEmployeeId($id, $page);
-
         return $this->render('employee/details.html.twig', [
             "employee" => $employee,
-            "form" => $form,
-            "work_times" => $workTimes,
-            'pagination' => [
-                'current' => $page,
-                'total' => max(1, ceil($totalWorkTimes / WorkTime::PAGE_SIZE))
-            ]
+            "form" => $form
         ]);
     }
 
@@ -73,7 +65,7 @@ class EmployeeController extends AbstractController
             "employees" => $employees,
             'pagination' => [
                 'current' => $page,
-                'total' => max(1, ceil($totalEmployees / WorkTime::PAGE_SIZE))
+                'total' => max(1, ceil($totalEmployees / Worktime::PAGE_SIZE))
             ]
         ]);
     }

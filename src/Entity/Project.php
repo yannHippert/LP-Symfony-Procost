@@ -33,12 +33,12 @@ class Project
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deliveredAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: WorkTime::class)]
-    private Collection $workTimes;
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Worktime::class)]
+    private Collection $worktimes;
 
     public function __construct()
     {
-        $this->workTimes = new ArrayCollection();
+        $this->worktimes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -107,29 +107,29 @@ class Project
     }
 
     /**
-     * @return Collection<int, WorkTime>
+     * @return Collection<int, Worktime>
      */
-    public function getWorkTimes(): Collection
+    public function getworktimes(): Collection
     {
-        return $this->workTimes;
+        return $this->worktimes;
     }
 
-    public function addWorkTime(WorkTime $workTime): self
+    public function addWorktime(Worktime $worktime): self
     {
-        if (!$this->workTimes->contains($workTime)) {
-            $this->workTimes->add($workTime);
-            $workTime->setProject($this);
+        if (!$this->worktimes->contains($worktime)) {
+            $this->worktimes->add($worktime);
+            $worktime->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeWorkTime(WorkTime $workTime): self
+    public function removeWorktime(Worktime $worktime): self
     {
-        if ($this->workTimes->removeElement($workTime)) {
+        if ($this->worktimes->removeElement($worktime)) {
             // set the owning side to null (unless already changed)
-            if ($workTime->getProject() === $this) {
-                $workTime->setProject(null);
+            if ($worktime->getProject() === $this) {
+                $worktime->setProject(null);
             }
         }
 
@@ -139,7 +139,7 @@ class Project
     public function productionCost(): float
     {
         $cost = 0;
-        foreach ($this->workTimes as $worktime) {
+        foreach ($this->worktimes as $worktime) {
             $cost += $worktime->getTotalPrice();
         }
         return $cost;

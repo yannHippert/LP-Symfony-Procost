@@ -4,10 +4,10 @@ namespace App\DataFixtures;
 
 use App\Entity\Employee;
 use App\Entity\Profession;
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 use App\Factory\Employee\EmployeeFactoryInterface;
 use App\Factory\Project\ProjectFactoryInterface;
-use App\Form\Data\WorkTimeData;
+use App\Form\Data\WorktimeData;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -71,10 +71,10 @@ class AppFixtures extends Fixture
             while($sum <= $target) {
                 $lowerDate = $project->getCreatedAt()->format("Y-M-d H:m:s");
                 $upperDate = min(intval($project->getCreatedAt()->format("Y") + 2), (new \DateTime())->format("Y")) . $project->getCreatedAt()->format("-M-d H:m:s");
-                $worktimeData = new WorkTimeData();
+                $worktimeData = new WorktimeData();
                 $worktimeData->setProject($project)
                     ->setDaysSpent($this->faker->randomDigitNotZero());
-                $worktime = new WorkTime($worktimeData, $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1)));
+                $worktime = new Worktime($worktimeData, $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1)));
                 $worktime->setCreatedAt($this->faker->dateTimeBetween($lowerDate, $upperDate));
                 $sum += $worktime->getTotalPrice();
                 $hightestCreatedAt = $hightestCreatedAt != null ?max($hightestCreatedAt, $worktime->getCreatedAt()) : $worktime->getCreatedAt();

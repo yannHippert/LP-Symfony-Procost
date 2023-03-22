@@ -2,15 +2,15 @@
 
 namespace App\Event;
 
-use App\Entity\WorkTime;
+use App\Entity\Worktime;
 
-final class WorkTimeCreated
+final class WorktimeCreated
 {
     public function __construct(
-        private WorkTime $worktime
+        private Worktime $worktime
     ) {}
 
-    public function getWorkTime(): WorkTime
+    public function getWorktime(): Worktime
     {
         return $this->worktime;
     }

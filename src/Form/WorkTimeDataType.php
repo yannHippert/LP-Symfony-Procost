@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Project;
-use App\Form\Data\WorkTimeData;
+use App\Form\Data\WorktimeData;
 use App\Repository\ProjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class WorkTimeDataType extends AbstractType
+class WorktimeDataType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,7 +35,7 @@ class WorkTimeDataType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => WorkTimeData::class
+            'data_class' => WorktimeData::class
         ]);
     }
 }

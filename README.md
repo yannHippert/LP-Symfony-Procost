@@ -23,25 +23,25 @@ docker-compose -f ./docker/docker-compose.yml start
 ## Create database migration file
 
 ```sh
-php ./bin/console doctrine:migration:diff
+php bin/console doctrine:migration:diff
 ```
 
 ## Apply migration to the database
 
 ```sh
-php ./bin/console doctrine:migration:migrate
+php bin/console doctrine:migration:migrate
 ```
 
 ## Load dummy data
 
 ```sh
-php ./bin/console doctrine:fixtures:load
+php bin/console doctrine:fixtures:load
 ```
 
 ## Start dev server
 
 ```sh
-php -S 0.0.0.0:8000 -t ./public/
+php -S 0.0.0.0:8000 -t public
 ```
 
 ## Get the event-chain

@@ -5,7 +5,7 @@ namespace App\Form\Data;
 use App\Entity\Project;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class WorkTimeData
+class WorktimeData
 {
     private Project $project;
 

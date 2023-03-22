@@ -12,7 +12,7 @@ class DefaultProjectFactory implements ProjectFactoryInterface
     {
         $project = new Project();
 
-        $project->setCreatedAt(new \DateTime('now'));
+        $project->setCreatedAt(new \DateTime());
 
         return $project;
     }
