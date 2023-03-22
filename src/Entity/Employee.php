@@ -49,7 +49,7 @@ class Employee
     #[Assert\LessThanOrEqual('today', message: "La date d'embauche ne peux pas être supérieur à la date actuelle !")]
     private ?\DateTimeImmutable $employmentDate = null;
 
-    #[ORM\OneToMany(mappedBy: 'employee', targetEntity: WorkTime::class)]
+    #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Worktime::class)]
     private Collection $worktimes;
 
     public function __construct() 
@@ -135,14 +135,14 @@ class Employee
     }
 
     /**
-     * @return Collection<int, WorkTime>
+     * @return Collection<int, Worktime>
      */
     public function getworktimes(): Collection
     {
         return $this->worktimes;
     }
 
-    public function addWorkTime(WorkTime $workTime): self
+    public function addWorktime(Worktime $workTime): self
     {
         if (!$this->worktimes->contains($workTime)) {
             $this->worktimes->add($workTime);
@@ -152,7 +152,7 @@ class Employee
         return $this;
     }
 
-    public function removeWorkTime(WorkTime $workTime): self
+    public function removeWorktime(Worktime $workTime): self
     {
         if ($this->worktimes->removeElement($workTime)) {
             // set the owning side to null (unless already changed)
