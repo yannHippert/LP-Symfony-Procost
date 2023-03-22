@@ -73,28 +73,15 @@ class EmployeeRepository extends ServiceEntityRepository
             ->getSingleResult();
     }
 
-//    /**
-//     * @return Employee[] Returns an array of Employee objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getBest() 
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.worktimes', 'w')
+            ->groupBy('e')
+            ->orderBy('SUM(w.daysSpent * e.dailySalary)', "DESC")
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleResult();
+    }
 
-//    public function findOneBySomeField($value): ?Employee
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

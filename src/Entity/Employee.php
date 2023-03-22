@@ -168,4 +168,13 @@ class Employee
     {
         return $this->firstName . " " . strtoupper($this->lastName);
     }
+
+    public function getTotalCost(): int 
+    {
+        $cost = 0;
+        foreach ($this->worktimes as $worktime) {
+            $cost += $worktime->getDaysSpent() * $this->dailySalary;
+        }
+        return $cost;   
+    }
 }

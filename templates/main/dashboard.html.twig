@@ -15,12 +15,9 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="widget-small info coloured-icon">
-                    <i
-                        class="icon fa fa-spinner fa-3x"
-                        aria-hidden="true"></i>
+                    <i class="icon fa fa-spinner fa-3x" aria-hidden="true"></i>
                     <div class="info">
-                        <p
-                            class="text-muted text-sm text-uppercase">
+                        <p class="text-muted text-sm text-uppercase">
                             Projets en cours
                         </p>
                         <p><strong>{{ open_projects }}</strong></p>
@@ -29,12 +26,10 @@
             </div>
             <div class="col-md-6">
                 <div class="widget-small warning coloured-icon">
-                    <i
-                        class="icon fa fa-check-square-o fa-3x"
+                    <i class="icon fa fa-check-square-o fa-3x"
                         aria-hidden="true"></i>
                     <div class="info">
-                        <p
-                            class="text-muted text-sm text-uppercase">
+                        <p class="text-muted text-sm text-uppercase">
                             Projets livrés
                         </p>
                         <p><strong>{{ delivered_projects }}</strong></p>
@@ -45,8 +40,7 @@
                 <div class="widget-small primary coloured-icon">
                     <i class="icon fa fa-users fa-3x"></i>
                     <div class="info">
-                        <p
-                            class="text-muted text-sm text-uppercase">
+                        <p class="text-muted text-sm text-uppercase">
                             Employés
                         </p>
                         <p><strong>{{ employee_count }}</strong></p>
@@ -55,15 +49,12 @@
             </div>
             <div class="col-md-6">
                 <div class="widget-small danger coloured-icon">
-                    <i
-                        class="icon fa fa-calendar-check-o fa-3x"
-                        aria-hidden="true"></i>
+                    <i class="icon fa fa-calendar-check-o fa-3x" aria-hidden="true"></i>
                     <div class="info">
-                        <p
-                            class="text-muted text-sm text-uppercase">
+                        <p class="text-muted text-sm text-uppercase">
                             Jours de production
                         </p>
-                        <p><strong>{{ production_days }} ({{ production_time }})</strong></p>
+                        <p><strong>{{ production_time }}</strong></p>
                     </div>
                 </div>
             </div>
@@ -76,12 +67,10 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted">
-                            <i
-                                class="fa fa-database mr-2 text-primary"></i>
-                            70% RENTABLE
+                            <i class="fa fa-database mr-2 text-primary"></i>
+                            {{ profitable_rate }}% RENTABLE
                         </p>
-                        <div
-                            class="embed-responsive embed-responsive-16by9">
+                        <div class="embed-responsive embed-responsive-16by9">
                             <canvas
                                 id="ratio-chart"
                                 class="embed-responsive-item"></canvas>
@@ -96,12 +85,10 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted">
-                            <i
-                                class="fa fa fa-check-square-o mr-2 text-primary"></i>
+                            <i class="fa fa fa-check-square-o mr-2 text-primary"></i>
                             {{ delivery_rate }}% Livrés
                         </p>
-                        <div
-                            class="embed-responsive embed-responsive-16by9">
+                        <div class="embed-responsive embed-responsive-16by9">
                             <canvas
                                 id="delivered-chart"
                                 class="embed-responsive-item"></canvas>
@@ -111,8 +98,7 @@
             </div>
             <div class="col-md-4">
                 <div class="card">
-                    <div
-                        class="card-header text-center text-uppercase">
+                    <div class="card-header text-center text-uppercase">
                         Top employé
                     </div>
                     <div class="card-body">
@@ -122,7 +108,7 @@
                                 class="rounded-circle"
                                 width="58" />
                             <p class="mt-2">
-                                <strong>Zac Producteur</strong>
+                                <strong>{{ best_employee.fullName }}</strong>
                             </p>
                         </div>
                         <div class="row">
@@ -130,11 +116,11 @@
                                 <p class="small mt">
                                     EMPLOYÉ DEPUIS
                                 </p>
-                                <p>Février 2012</p>
+                                <p>{{ best_employee.employmentDate|date("M Y") }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p class="small mt">COÛT TOTAL</p>
-                                <p>34 567 €</p>
+                                <p>{{ best_employee.totalCost|format_currency('EUR') }}</p>
                             </div>
                         </div>
                     </div>
@@ -204,7 +190,7 @@
         integrity="sha256-oSgtFCCmHWRPQ/JmR4OoZ3Xke1Pw4v50uh6pLcu+fIc="
         crossorigin="anonymous"></script>
     <script>
-        var ratioData = [70, 30];
+        var ratioData = [{{ profitable_rate }}, {{ 100 - profitable_rate }}];
         var deliveredData = [{{ delivery_rate }}, 100 - {{ delivery_rate }}];
     </script>
 

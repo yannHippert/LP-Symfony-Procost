@@ -47,11 +47,11 @@
                     </tr>
                     <tr>
                         <th>Date d'embauche</td>
-                        <td>{{ employee.employmentDate|date("d M Y")}}</td>
+                        <td>{{ employee.employmentDate|date("d M Y") }}</td>
                     </tr>
                 </tbody>
             </table>
-            <a href={{ path("employee_update", { id: employee.id })}} class="btn btn-info">
+            <a href={{ path("employee_update", { id: employee.id }) }} class="btn btn-info">
                 <i class="fa fa-pencil"></i>Modifier
             </a>
         </div>

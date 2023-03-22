@@ -122,6 +122,15 @@ class WorktimeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getGlobalProductionTime(): int 
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('sum(w.daysSpent)')
+            ->from(Worktime::class, 'w')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     private function addPagination(QueryBuilder $qb, ?int $page): void
     {
         if($page != null) {

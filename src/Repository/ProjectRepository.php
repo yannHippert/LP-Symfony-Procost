@@ -113,6 +113,24 @@ class ProjectRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countProfitable()
+    {
+        $subquery = $this->_em->createQueryBuilder()
+            ->select('SUM(w.daysSpent * e.dailySalary)')
+            ->from(Worktime::class, 'w')
+            ->leftJoin('w.employee', 'e')
+            ->where('w.project = p.id')
+            ->getDQL();
+    
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.deliveredAt IS NOT NULL')
+            ->andWhere("p.price < ($subquery)")
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
+
     public function countWorktimesOfProject(int $projectId): int
     {
         return $this->_em->createQueryBuilder()
@@ -146,17 +164,6 @@ class ProjectRepository extends ServiceEntityRepository
         return $qb
             ->getQuery()
             ->getResult();
-    }
-
-    public function getOldest()
-    {
-        $qb = $this->createQueryBuilder('p')
-            ->orderBy('p.createdAt', 'ASC')
-            ->setMaxResults(1);
-
-        return $qb
-            ->getQuery()
-            ->getSingleResult();
     }
 
     private function addWhereProjectClause(QueryBuilder $qb, int $projectId): void
