@@ -57,11 +57,22 @@ class ProjectRepository extends ServiceEntityRepository
             ->getSingleResult();
     }
 
-    public function findOpen(): array 
+    public function getAllOpen(): array 
     {
         $qb = $this->createQueryBuilder('p')
+            ->where('p.deliveredAt IS NULL')
             ->orderBy('p.name', 'ASC');
-            //->where('p.deliveredAt' < now())
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getAllDelivered(): array 
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.deliveredAt IS NOT NULL')
+            ->orderBy('p.name', 'ASC');
 
         return $qb
             ->getQuery()
@@ -88,7 +99,9 @@ class ProjectRepository extends ServiceEntityRepository
             ->setParameter('ids', $ids)
             ->orderBy('p.createdAt', 'DESC');
     
-        return $qb->getQuery()->getResult();
+        return $qb
+            ->getQuery()
+            ->getResult();
     }
 
     public function countEmployeesOfProject(int $projectId): int
@@ -111,6 +124,41 @@ class ProjectRepository extends ServiceEntityRepository
             ->setParameter('projectId', $projectId)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function getLatest(int $resultCount = 6): array
+    {
+        $ids = $this->_em->createQueryBuilder()
+            ->select('p.id')
+            ->from(Project::class, 'p')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($resultCount)
+            ->getQuery()
+            ->getArrayResult();
+
+        $qb = $this->createQueryBuilder('p')
+            ->addSelect("w")
+            ->addSelect("e")
+            ->leftJoin('p.workTimes', 'w')
+            ->leftJoin('w.employee', 'e')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('p.createdAt', 'DESC');
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOldest()
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'ASC')
+            ->setMaxResults(1);
+
+        return $qb
+            ->getQuery()
+            ->getSingleResult();
     }
 
     private function addWhereProjectClause(QueryBuilder $qb, int $projectId): void

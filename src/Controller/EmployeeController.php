@@ -35,13 +35,11 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $openProjects = $this->projectRepository->findOpen();
         $totalWorkTimes = $this->workTimeRepository->countOfEmployee($id);
         $workTimes = $this->workTimeRepository->findByEmployeeId($id, $page);
 
         return $this->render('employee/details.html.twig', [
             "employee" => $employee,
-            "open_projects" => $openProjects,
             "work_times" => $workTimes,
             'pagination' => [
                 'current' => $page,

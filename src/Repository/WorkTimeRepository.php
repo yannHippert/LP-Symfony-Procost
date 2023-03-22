@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\WorkTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -73,6 +74,19 @@ class WorkTimeRepository extends ServiceEntityRepository
             ->leftJoin('w.employee', 'e')
             ->where('w.project = :projectId')
             ->setParameter('projectId', $projectId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getLatest(int $resultCount = 6): array
+    {
+        return $this->createQueryBuilder('w')
+            ->addSelect('p')
+            ->addSelect('e')
+            ->leftJoin('w.project', 'p')
+            ->leftJoin('w.employee', 'e')
+            ->orderBy('w.createdAt', 'DESC')
+            ->setMaxResults($resultCount)
             ->getQuery()
             ->getResult();
     }

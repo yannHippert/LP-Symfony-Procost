@@ -135,4 +135,13 @@ class Project
 
         return $this;
     }
+
+    public function productionCost(): float
+    {
+        $cost = 0;
+        foreach ($this->workTimes as $worktime) {
+            $cost += $worktime->getTotalPrice();
+        }
+        return $cost;
+    }
 }
