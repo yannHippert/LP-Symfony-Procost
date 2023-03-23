@@ -13,7 +13,9 @@
             <tbody>
                 {% for worktime in worktimes %}
                     <tr>
-                        <td>{{ worktime.employee.fullName }}</td>
+                        <td>
+                            <a href={{ path("employee_details", { id: worktime.employee.id }) }}>{{ worktime.employee.fullName }}</a>
+                        </td>
                         <td>{{ worktime.daysSpent }} jours</td>
                         <td>{{ worktime.createdAt|date("d-m-Y") }}</td>
                         <td>{{ worktime.totalPrice|format_currency('EUR') }}</td>

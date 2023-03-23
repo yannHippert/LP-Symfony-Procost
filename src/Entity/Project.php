@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
@@ -19,12 +20,19 @@ class Project
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Length(min: 5, minMessage: "La nom d'un projet doit contenir au minimum {{ limit }} caractères !")]
+    #[Assert\Length(max: 255, maxMessage: "Le nom d'un projet doit contenir au maximum {{ limit }} caractères !")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Length(min: 25, minMessage: 'La description doit contenir au minimum {{ limit }} caractères !')]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Positive(message: 'Le salaire journalier ne peux pas être negatif !')]
     private ?float $price = null;
 
     #[ORM\Column]
@@ -82,7 +90,7 @@ class Project
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -109,7 +117,7 @@ class Project
     /**
      * @return Collection<int, Worktime>
      */
-    public function getworktimes(): Collection
+    public function getWorktimes(): Collection
     {
         return $this->worktimes;
     }
@@ -136,7 +144,7 @@ class Project
         return $this;
     }
 
-    public function productionCost(): float
+    public function getProductionCost(): float
     {
         $cost = 0;
         foreach ($this->worktimes as $worktime) {

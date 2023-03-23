@@ -25,13 +25,15 @@
                     <th>Worktimes</th>
                     <th>Date de création</th>
                     <th>Date de livraison</th>
-                    <th></th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for project in projects %}
                     <tr>
-                        <td>{{ project.name }}</td>
+                        <td>
+                            <a href={{ path("project_details", { id: project.id })}}>{{ project.name }}</a>
+                        </td>
                         <td>{{ project.price|format_currency('EUR') }}</td>
                         <td>{{ project.workTimes|length }}</td>
                         <td>{{ project.createdAt|date("m/Y", "Europe/Paris") }}</td>
@@ -43,6 +45,9 @@
                             {% if project.deliveredAt == null %}
                                 <a href={{ path("project_update", { id: project.id })}} class="btn btn-info btn-sm">
                                     <i class="fa fa-pencil mr-0"></i>
+                                </a>
+                                <a href={{ path("project_deliver", { id: project.id })}} class="btn btn-warning btn-sm text-white">
+                                    <i class="fa fa-check-square-o mr-0"></i>
                                 </a>
                             {% endif %}
                         </td>

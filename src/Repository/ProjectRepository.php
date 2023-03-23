@@ -41,7 +41,7 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
-    public function getById(int $id, int $page): Project
+    public function getById(int $id): Project
     {
         return $this->createQueryBuilder('p')
             ->addSelect('w')

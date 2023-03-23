@@ -9,10 +9,10 @@
     </div>
     <ul class="app-breadcrumb breadcrumb">
         <li class="breadcrumb-item">
-            <a href="#"><i class="fa fa-home fa-lg"></i></a>
+            <a href={{ path('main_dashboard') }}><i class="fa fa-home fa-lg"></i></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="#">Projets</a>
+            <a href={{ path('projects_list') }}>Projets</a>
         </li>
         <li class="breadcrumb-item">Suivi de {{ project.name }}</li>
     </ul>
@@ -57,42 +57,15 @@
                     {% endif %}
                 </tbody>
             </table>
-            <a href={{ path("project_update", { id: project.id })}} class="btn btn-info">
-                <i class="fa fa-pencil"></i>Modifier
-            </a>
+            {% if project.deliveredAt is null %}
+                <a href={{ path("project_update", { id: project.id })}} class="btn btn-info">
+                    <i class="fa fa-pencil"></i>Modifier
+                </a>
+                <a href={{ path("project_deliver", { id: project.id })}} class="btn btn-warning text-white">
+                    <i class="fa fa-check-square-o"></i>Livrer
+                </a>
+            {% endif %}
         </div>
-
-        {# <div class="tile">
-            <h3 class="title-title mb-4">Ajouter un temps</h3>
-            <form class="form-horizontal">
-                <div class="form-group row">
-                    <label for="select-projects" class="control-label col-md-6">Projet concerné</label>
-                    <div class="col-md-6">
-                        <select class="form-control" id="select-projects">
-                            <option>Projet 1</option>
-                            <option>Projet 2</option>
-                            <option>Projet 3</option>
-                            <option>Projet 4</option>
-                            <option>Projet 5</option>
-                            <option>Projet 6</option>
-                            <option>Projet 7</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="days-count" class="control-label col-md-6">Nombre de jours</label>
-                    <div class="col-md-6">
-                        <input id="days-count" class="form-control" type="number" min="1">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="offset-md-6 col-md-8">
-                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i>Enregistrer</a>
-                    </div>
-                </div>
-            </form>
-        </div> #}
-
     </div>
 
     <div class="col-md-8">

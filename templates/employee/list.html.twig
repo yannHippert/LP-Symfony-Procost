@@ -31,7 +31,9 @@
             <tbody>
                 {% for employee in employees %}
                     <tr>
-                        <td>{{ employee.fullName }}</td>
+                        <td>
+                            <a href={{ path("employee_details", { id: employee.id })}}>{{ employee.fullName }}</a>
+                        </td>
                         <td>{{ employee.email }}</td>
                         <td>{{ employee.profession.name }}</td>
                         <td>{{ employee.dailySalary|format_currency('EUR') }}</td>

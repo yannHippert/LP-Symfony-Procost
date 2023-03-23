@@ -1,11 +1,11 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}{{ form_title }} - {{ parent() }}{% endblock %}
+{% block title %}{{ title }} - {{ parent() }}{% endblock %}
 
 {% block content %}
 <div class="app-title">
     <div>
-        <h1><i class="fa fa-users"></i>&nbsp;{{ form_title }}</h1>
+        <h1><i class="fa fa-users"></i>&nbsp;{{ title }}</h1>
     </div>
     <ul class="app-breadcrumb breadcrumb">
         <li class="breadcrumb-item">
@@ -14,7 +14,7 @@
         <li class="breadcrumb-item">
             <a href={{ path('employees_list') }}>Employés</a>
         </li>
-        <li class="breadcrumb-item">{{ form_title }}</li>
+        <li class="breadcrumb-item">{{ title }}</li>
     </ul>
 </div>
 <div class="tile">

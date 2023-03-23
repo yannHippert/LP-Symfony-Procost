@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Employee;
 use App\Entity\Worktime;
 use App\EventManager\EmployeeManager;
 use App\EventManager\WorktimeManager;
@@ -16,6 +17,7 @@ use Doctrine\ORM\UnexpectedResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -44,6 +46,10 @@ class EmployeeController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
+            if($workTimeData->getProject()->getDeliveredAt() != null) {
+                throw new BadRequestHttpException();
+            }
+
             $this->workTimeManager->addWorktime($workTimeData, $employee);
 
             return $this->redirectToRoute('employee_details', ['id' => $id, 'page' => $page]);
@@ -51,7 +57,8 @@ class EmployeeController extends AbstractController
 
         return $this->render('employee/details.html.twig', [
             "employee" => $employee,
-            "form" => $form
+            "page" => $page,
+            "form" => $form,
         ]);
     }
 
@@ -74,18 +81,8 @@ class EmployeeController extends AbstractController
     public function create_employee(Request $request): Response
     {
         $employee = $this->employeeFactory->createEmployee();
-        $form = $this->createForm(EmployeeType::class, $employee);
-        $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()) {
-            $this->employeeManager->addEmployee($employee);
-
-            return $this->redirectToRoute('employee_details', ["id" => $employee->getId()]);
-        }
-
-        return $this->render('employee/create.html.twig', [
-            'form' => $form->createView()
-        ]);
+        return $this->employee_form($request, $employee, "");
     }
 
     #[Route('/employee/{id}/update', name: 'employee_update', methods: ['GET', 'POST'], requirements: ['page' => '\d+'])]
@@ -96,7 +93,12 @@ class EmployeeController extends AbstractController
         } catch(UnexpectedResultException) {
             throw new NotFoundHttpException();
         }
+        
+        return $this->employee_form($request, $employee, "");
+    }
 
+    private function employee_form(Request $request, Employee $employee, string $title): Response
+    {
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
 
@@ -106,8 +108,9 @@ class EmployeeController extends AbstractController
             return $this->redirectToRoute('employee_details', ["id" => $employee->getId()]);
         }
 
-        return $this->render('employee/update.html.twig', [
-            'form' => $form->createView()
+        return $this->render('employee/form.html.twig', [
+            "form" => $form->createView(),
+            "title" => $title
         ]);
     }
 }

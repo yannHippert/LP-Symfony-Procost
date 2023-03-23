@@ -1,11 +1,11 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}{{ form_title }} - {{ parent() }}{% endblock %}
+{% block title %}{{ title }} - {{ parent() }}{% endblock %}
 
 {% block content %}
 <div class="app-title">
     <div>
-        <h1><i class="fa fa-laptop"></i>&nbsp;{{ form_title }}</h1>
+        <h1><i class="fa fa-laptop"></i>&nbsp;{{ title }}</h1>
     </div>
     <ul class="app-breadcrumb breadcrumb">
         <li class="breadcrumb-item">
@@ -14,7 +14,7 @@
         <li class="breadcrumb-item">
             <a href={{ path('projects_list') }}>Projets</a>
         </li>
-        <li class="breadcrumb-item">{{ form_title }}</li>
+        <li class="breadcrumb-item">{{ title }}</li>
     </ul>
 </div>
 <div class="tile">
@@ -38,7 +38,7 @@
             <h3>Production</h3>
             <div class="row mt-4">
                 <div class="offset-md-4 col-md-8">
-                    {% for form_field in ["price", "createdAt"] %}
+                    {% for form_field in ["price"] %}
                         {% include 'components/form_field.html.twig' with { form_field: form_field } %}
                     {% endfor %}
                 </div>

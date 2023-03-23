@@ -4,6 +4,9 @@ namespace App\EventSubscriber;
 
 use App\Event\EmployeeCreated;
 use App\Event\EmployeeUpdated;
+use App\Event\ProjectCreated;
+use App\Event\ProjectDelivered;
+use App\Event\ProjectUpdated;
 use App\Event\WorktimeCreated;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -19,6 +22,15 @@ final class FlashSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            ProjectCreated::class => [
+                ["onProjectCreated"]
+            ],
+            ProjectUpdated::class => [
+                ["onProjectUpdated"]
+            ],
+            ProjectDelivered::class => [
+                ["onProjectDelivered"]
+            ],
             EmployeeCreated::class => [
                 ["onEmployeeCreated"]
             ],
@@ -29,6 +41,21 @@ final class FlashSubscriber implements EventSubscriberInterface
                 ["onWorktimeCreated"]
             ]
         ];
+    }
+
+    public function onProjectCreated(ProjectCreated $payload): void 
+    {
+        $this->addFlash('success', "Le projet {$payload->getProject()->getName()} a été créé !");
+    }
+
+    public function onProjectUpdated(ProjectUpdated $payload): void 
+    {
+        $this->addFlash('success', "Le projet {$payload->getProject()->getName()} a été modifié !");
+    }
+
+    public function onProjectDelivered(ProjectDelivered $payload): void 
+    {
+        $this->addFlash('success', "Le projet {$payload->getProject()->getName()} a été livré !");
     }
 
     public function onEmployeeCreated(EmployeeCreated $payload): void 

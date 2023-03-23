@@ -18,7 +18,6 @@ class AppFixtures extends Fixture
     public const PROFESSION_COUNT = 6;
     public const EMPLOYEE_COUNT = 32;
     public const PROJECT_COUNT = 72;
-    public const DELIVERED_PERCENTAGE = 75;
 
     private $manager;
     private $faker;
@@ -65,23 +64,26 @@ class AppFixtures extends Fixture
     {
         for($i = 0; $i < self::PROJECT_COUNT;  $i++) {
             $project = $this->projectFactory->createProject();
-            $target = mt_rand(0, $project->getPrice() + 10000);
+            $target = mt_rand(0, $project->getPrice() + 5000);
             $sum = 0;
-            $hightestCreatedAt = null;
             while($sum <= $target) {
-                $lowerDate = $project->getCreatedAt()->format("Y-M-d H:m:s");
-                $upperDate = min(intval($project->getCreatedAt()->format("Y") + 2), (new \DateTime())->format("Y")) . $project->getCreatedAt()->format("-M-d H:m:s");
-                $worktimeData = new WorktimeData();
-                $worktimeData->setProject($project)
+                $lowerDate = $project->getCreatedAt();
+                if($project->getDeliveredAt() != null) {
+                    $upperDate = new \DateTime($lowerDate->format((intval($lowerDate->format("Y")) + 2) . "-m-d"));
+                    $upperDate = $upperDate->getTimestamp() > (new \DateTime())->getTimestamp() ? new \DateTime() : $upperDate;
+                } else {
+                    $upperDate = $project->getDeliveredAt();
+                }
+                $worktimeData = (new WorktimeData())
+                    ->setProject($project)
                     ->setDaysSpent($this->faker->randomDigitNotZero());
                 $worktime = new Worktime($worktimeData, $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1)));
-                $worktime->setCreatedAt($this->faker->dateTimeBetween($lowerDate, $upperDate));
+                $worktime->setCreatedAt($this->faker->dateTimeBetween(
+                    $lowerDate->format("Y-M-d H:m:s"), 
+                    $upperDate->format("Y-M-d H:m:s")
+                ));
                 $sum += $worktime->getTotalPrice();
-                $hightestCreatedAt = $hightestCreatedAt != null ?max($hightestCreatedAt, $worktime->getCreatedAt()) : $worktime->getCreatedAt();
                 $this->manager->persist($worktime);
-            }
-            if(random_int(0, 100) <= self::DELIVERED_PERCENTAGE) {
-                $project->setDeliveredAt((new \DateTime())->setTimestamp($hightestCreatedAt->getTimestamp()));
             }
 
             $this->manager->persist($project);
