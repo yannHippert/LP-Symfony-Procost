@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -124,6 +125,10 @@ class Project
 
     public function addWorktime(Worktime $worktime): self
     {
+        if($this->deliveredAt != null) {
+            throw new InvalidArgumentException("A delivered project cannot get more worktime!"); 
+        }
+
         if (!$this->worktimes->contains($worktime)) {
             $this->worktimes->add($worktime);
             $worktime->setProject($this);

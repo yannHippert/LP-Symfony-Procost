@@ -38,12 +38,16 @@
                         <td>{{ project.price|format_currency('EUR') }}</td>
                     </tr>
                     <tr>
-                        <th>Prix actuelle</th>
+                        <th>Coûts de production</th>
                         <td class={{ project.price < project.productionCost ? "text-danger" }}>{{ project.productionCost|format_currency('EUR') }}</td>
                     </tr>
                     <tr>
-                        <th>Nombre d'employés ayant travaillé</th>
+                        <th>Nbr d'employés ayant travaillé</th>
                         <td>{{ employeeCount }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nbr de sessions de travail</th>
+                        <td>{{ project.worktimes|length }}</td>
                     </tr>
                     <tr>
                         <th>Date de création</th>

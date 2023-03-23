@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Form\Data\WorktimeData;
 use App\Repository\WorktimeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 
 #[ORM\Entity(repositoryClass: WorktimeRepository::class)]
 class Worktime
@@ -62,6 +63,10 @@ class Worktime
 
     public function setProject(?Project $project): self
     {
+        if($project->getDeliveredAt() != null) {
+            throw new InvalidArgumentException("Worktime cannot be added to a delivered project!"); 
+        }
+
         $this->project = $project;
 
         return $this;

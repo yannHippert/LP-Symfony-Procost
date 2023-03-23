@@ -19,6 +19,8 @@ class AppFixtures extends Fixture
     public const EMPLOYEE_COUNT = 32;
     public const PROJECT_COUNT = 72;
 
+    public const PROJECT_DELIVERED_PERCENTAGE = 75;
+
     private $manager;
     private $faker;
 
@@ -67,23 +69,23 @@ class AppFixtures extends Fixture
             $target = mt_rand(0, $project->getPrice() + 5000);
             $sum = 0;
             while($sum <= $target) {
-                $lowerDate = $project->getCreatedAt();
-                if($project->getDeliveredAt() != null) {
-                    $upperDate = new \DateTime($lowerDate->format((intval($lowerDate->format("Y")) + 2) . "-m-d"));
-                    $upperDate = $upperDate->getTimestamp() > (new \DateTime())->getTimestamp() ? new \DateTime() : $upperDate;
-                } else {
-                    $upperDate = $project->getDeliveredAt();
-                }
                 $worktimeData = (new WorktimeData())
                     ->setProject($project)
                     ->setDaysSpent($this->faker->randomDigitNotZero());
-                $worktime = new Worktime($worktimeData, $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1)));
+                $worktime = new Worktime(
+                    $worktimeData, 
+                    $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1))
+                );
                 $worktime->setCreatedAt($this->faker->dateTimeBetween(
-                    $lowerDate->format("Y-M-d H:m:s"), 
-                    $upperDate->format("Y-M-d H:m:s")
+                    $project->getCreatedAt()->format("Y-M-d H:m:s"), 
+                    "now"
                 ));
                 $sum += $worktime->getTotalPrice();
                 $this->manager->persist($worktime);
+            }
+
+            if(random_int(0, 100) <= self::PROJECT_DELIVERED_PERCENTAGE) {
+                $project->setDeliveredAt($this->faker->dateTimeBetween($project->getCreatedAt()->format("Y-M-d H:m:s"), 'now'));
             }
 
             $this->manager->persist($project);
