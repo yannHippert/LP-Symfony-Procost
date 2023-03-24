@@ -1,10 +1,10 @@
 <?php 
 
-namespace App\Event;
+namespace App\Event\Employee;
 
 use App\Entity\Employee;
 
-final class EmployeeUpdated
+final class EmployeeCreated
 {
     public function __construct(
         private Employee $employee
@@ -15,3 +15,4 @@ final class EmployeeUpdated
         return $this->employee;
     }
 }
+

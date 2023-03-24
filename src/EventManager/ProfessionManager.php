@@ -3,9 +3,9 @@
 namespace App\EventManager;
 
 use App\Entity\Profession;
-use App\Event\ProfessionCreated;
-use App\Event\ProfessionDeleted;
-use App\Event\ProfessionUpdated;
+use App\Event\Profession\ProfessionCreated;
+use App\Event\Profession\ProfessionDeleted;
+use App\Event\Profession\ProfessionUpdated;
 use App\Repository\ProfessionRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 

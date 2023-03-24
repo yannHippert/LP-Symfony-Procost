@@ -2,15 +2,15 @@
 
 namespace App\EventSubscriber;
 
-use App\Event\EmployeeCreated;
-use App\Event\EmployeeUpdated;
-use App\Event\ProfessionCreated;
-use App\Event\ProfessionDeleted;
-use App\Event\ProfessionUpdated;
-use App\Event\ProjectCreated;
-use App\Event\ProjectDelivered;
-use App\Event\ProjectUpdated;
-use App\Event\WorktimeCreated;
+use App\Event\Employee\EmployeeCreated;
+use App\Event\Employee\EmployeeUpdated;
+use App\Event\Profession\ProfessionCreated;
+use App\Event\Profession\ProfessionDeleted;
+use App\Event\Profession\ProfessionUpdated;
+use App\Event\Project\ProjectCreated;
+use App\Event\Project\ProjectDelivered;
+use App\Event\Project\ProjectUpdated;
+use App\Event\Worktime\WorktimeCreated;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;

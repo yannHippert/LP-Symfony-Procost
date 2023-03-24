@@ -4,8 +4,7 @@ namespace App\EventManager;
 
 use App\Entity\Employee;
 use App\Entity\Worktime;
-use App\Event\EmployeeCreated;
-use App\Event\WorktimeCreated;
+use App\Event\Worktime\WorktimeCreated;
 use App\Form\Data\WorktimeData;
 use App\Repository\WorktimeRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;

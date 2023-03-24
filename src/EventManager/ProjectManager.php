@@ -3,9 +3,9 @@
 namespace App\EventManager;
 
 use App\Entity\Project;
-use App\Event\ProjectCreated;
-use App\Event\ProjectDelivered;
-use App\Event\ProjectUpdated;
+use App\Event\Project\ProjectCreated;
+use App\Event\Project\ProjectDelivered;
+use App\Event\Project\ProjectUpdated;
 use App\Repository\ProjectRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 

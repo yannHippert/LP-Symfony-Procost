@@ -3,8 +3,8 @@
 namespace App\EventManager;
 
 use App\Entity\Employee;
-use App\Event\EmployeeCreated;
-use App\Event\EmployeeUpdated;
+use App\Event\Employee\EmployeeCreated;
+use App\Event\Employee\EmployeeUpdated;
 use App\Repository\EmployeeRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 

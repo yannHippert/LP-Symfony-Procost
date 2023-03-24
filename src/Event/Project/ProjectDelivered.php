@@ -1,10 +1,10 @@
 <?php 
 
-namespace App\Event;
+namespace App\Event\Project;
 
 use App\Entity\Project;
 
-final class ProjectUpdated
+final class ProjectDelivered
 {
     public function __construct(
         private Project $project

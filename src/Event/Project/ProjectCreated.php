@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Event;
+namespace App\Event\Project;
 
 use App\Entity\Project;
 

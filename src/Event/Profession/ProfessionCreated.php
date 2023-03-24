@@ -1,10 +1,10 @@
 <?php 
 
-namespace App\Event;
+namespace App\Event\Profession;
 
 use App\Entity\Profession;
 
-final class ProfessionUpdated
+final class ProfessionCreated
 {
     public function __construct(
         private Profession $profession
