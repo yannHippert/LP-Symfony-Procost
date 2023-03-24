@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Employee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,15 +40,6 @@ class EmployeeRepository extends ServiceEntityRepository
         }
     }
 
-    // public function count(): int
-    // {
-    //     return $this->_em->createQueryBuilder()
-    //         ->select('count(e.id)')
-    //         ->from(Employee::class, 'e')
-    //         ->getQuery()
-    //         ->getSingleScalarResult();
-    // }
-
     public function getPage(int $page): array
     {
         $qb = $this->createQueryBuilder('e')
@@ -82,6 +74,29 @@ class EmployeeRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getSingleResult();
+    }
+
+    public function getOfProfession(int $professionId, ?int $page): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->where('e.profession = :professionId')
+            ->setParameter('professionId', $professionId)
+            ->orderBy('e.lastName', 'ASC');
+        
+        $this->addPagination($qb, $page);
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function addPagination(QueryBuilder $qb, ?int $page): void
+    {
+        if($page != null) {
+            $qb
+                ->setMaxResults(Employee::PAGE_SIZE)
+                ->setFirstResult(($page - 1) * Employee::PAGE_SIZE);
+        }
     }
 
 }

@@ -42,40 +42,23 @@ class WorktimeRepository extends ServiceEntityRepository
 
     public function countOfEmployee(int $employeeId): int
     {
-        return $this->_em->createQueryBuilder()
-            ->select('count(w.id)')
-            ->from(Worktime::class, 'w')
-            ->where('w.employee = :employeeId')
-            ->setParameter('employeeId', $employeeId)
+        $qb = $this->createQueryBuilder('w')
+            ->select('count(w.id)');
+
+        $this->addWhereEmployee($qb, $employeeId);   
+        
+        return $qb
             ->getQuery()
             ->getSingleScalarResult();
-    }
-
-    public function findByEmployeeId(int $employeeId, int $page = 1): array
-    {
-        return $this->createQueryBuilder('w')
-            ->addSelect('p')
-            ->addSelect('e')
-            ->leftJoin('w.project', 'p')
-            ->leftJoin('w.employee', 'e')
-            ->where('w.employee = :employeeId')
-            ->setParameter('employeeId', $employeeId)
-            ->orderBy('w.createdAt', 'DESC')
-            ->setMaxResults(Worktime::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * Worktime::PAGE_SIZE)
-            ->getQuery()
-            ->getResult();
     }
 
     public function getOfEmployee(int $employeeId, int $page = null): array
     {
         $qb = $this->createQueryBuilder('w')
-            ->addSelect('p')
-            ->addSelect('e')
-            ->leftJoin('w.project', 'p')
-            ->leftJoin('w.employee', 'e')
             ->orderBy('w.createdAt', 'DESC');
-            
+
+        $this->addSelectEmployee($qb);
+        $this->addSelectProject($qb);
         $this->addWhereEmployee($qb, $employeeId);
         $this->addPagination($qb, $page);
 
@@ -84,14 +67,16 @@ class WorktimeRepository extends ServiceEntityRepository
                 ->getResult();
     }
 
-    public function getOfProject(int $projectId, int $page = null): array
-    {
-        $qb = $this->createQueryBuilder('w')
-            ->addSelect('e')
-            ->leftJoin('w.employee', 'e');
+    public function getOfProject(
+        int $projectId, 
+        int $page = null, 
+        int $pageSize = Worktime::PAGE_SIZE
+    ): array {
+        $qb = $this->createQueryBuilder('w');
 
+        $this->addSelectEmployee($qb);
         $this->addWhereProject($qb, $projectId);
-        $this->addPagination($qb, $page);
+        $this->addPagination($qb, $page, $pageSize);
 
         return $qb 
             ->getQuery()
@@ -100,43 +85,44 @@ class WorktimeRepository extends ServiceEntityRepository
 
     public function countOfProject(int $projectId): int
     {
-        return $this->_em->createQueryBuilder()
-            ->select('count(w.id)')
-            ->from(Worktime::class, 'w')
-            ->where('w.project = :projectId')
-            ->setParameter('projectId', $projectId)
+        $qb = $this->createQueryBuilder('w')
+            ->select('count(w.id)');
+
+        $this->addWhereProject($qb, $projectId);   
+        
+        return $qb
             ->getQuery()
             ->getSingleScalarResult();
     }
 
     public function getLatest(int $resultCount = 6): array
     {
-        return $this->createQueryBuilder('w')
-            ->addSelect('p')
-            ->addSelect('e')
-            ->leftJoin('w.project', 'p')
-            ->leftJoin('w.employee', 'e')
+        $qb = $this->createQueryBuilder('w')
             ->orderBy('w.createdAt', 'DESC')
-            ->setMaxResults($resultCount)
+            ->setMaxResults($resultCount);
+
+        $this->addSelectEmployee($qb);
+        $this->addSelectProject($qb);
+
+        return $qb
             ->getQuery()
             ->getResult();
     }
 
     public function getGlobalProductionTime(): int 
     {
-        return $this->_em->createQueryBuilder()
+        return $this->createQueryBuilder('w')
             ->select('sum(w.daysSpent)')
-            ->from(Worktime::class, 'w')
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    private function addPagination(QueryBuilder $qb, ?int $page): void
+    private function addPagination(QueryBuilder $qb, ?int $page, int $pageSize = Worktime::PAGE_SIZE): void
     {
         if($page != null) {
             $qb
-                ->setMaxResults(Worktime::PAGE_SIZE)
-                ->setFirstResult(($page - 1) * Worktime::PAGE_SIZE);
+                ->setMaxResults($pageSize)
+                ->setFirstResult(($page - 1) * $pageSize);
         }
     }
 
@@ -147,11 +133,25 @@ class WorktimeRepository extends ServiceEntityRepository
             ->setParameter('projectId', $projectId);
     }
 
+    private function addSelectProject(QueryBuilder $qb): void
+    {
+        $qb
+            ->addSelect('p')
+            ->leftJoin('w.project', 'p');
+    }
+
     private function addWhereEmployee(QueryBuilder $qb, int $employeeId): void
     {
         $qb
             ->where('w.employee = :employeeId')
             ->setParameter('employeeId', $employeeId);
+    }
+
+    private function addSelectEmployee(QueryBuilder $qb): void
+    {
+        $qb
+            ->addSelect('e')
+            ->leftJoin('w.employee', 'e');
     }
 
 }

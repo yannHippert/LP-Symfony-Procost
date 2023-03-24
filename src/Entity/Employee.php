@@ -22,16 +22,19 @@ class Employee
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
     #[Assert\Length(min: 2, minMessage: 'Le prénom doit contenir au minimum {{ limit }} caractères !')]
+    #[Assert\Length(max: 255, maxMessage: "Le prénom doit contenir au maximum {{ limit }} caractères !")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
     #[Assert\Length(min: 2, minMessage: 'Le nom doit contenir au minimum {{ limit }} caractères !')]
+    #[Assert\Length(max: 255, maxMessage: 'Le nom doit contenir au maximum {{ limit }} caractères !')]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
     #[Assert\Email(message: 'L\'email {{ value }} n\'est pas valide !')]
+    #[Assert\Length(max: 255, maxMessage: 'L\'email doit contenir au maximum {{ limit }} caractères !')]
     private ?string $email = null;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
@@ -54,6 +57,7 @@ class Employee
 
     public function __construct() 
     {
+        $this->employmentDate = new \DateTimeImmutable();
         $this->worktimes = new ArrayCollection();
     }
 

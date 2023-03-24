@@ -1,0 +1,59 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ profession.name }} - {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="app-title">
+    <div>
+        <h1><i class="fa fa-laptop"></i>&nbsp;Détails sur {{ profession.name }}</h1>
+    </div>
+    <ul class="app-breadcrumb breadcrumb">
+        <li class="breadcrumb-item">
+            <a href={{ path('main_dashboard') }}><i class="fa fa-home fa-lg"></i></a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href={{ path('professions_list') }}>Métiers</a>
+        </li>
+        <li class="breadcrumb-item">Détails sur {{ profession.name }}</li>
+    </ul>
+</div>
+
+{% include 'components/flash_display.html.twig' %}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="tile">
+            <table class="table table-striped table-bordered table-sm">
+                <tbody>
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ profession.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nbr d'employés</th>
+                        <td>{{ profession.employees|length }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href={{ path("profession_update", { id: profession.id }) }} class="btn btn-info">
+                <i class="fa fa-pencil"></i>Modifier
+            </a>
+            {% if profession.employees|length == 0 %}
+                <a href={{ path("profession_delete", { id: profession.id })}} class="btn btn-danger">
+                    <i class="fa fa-trash"></i>Supprimer
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {{ render(controller('App\\Controller\\EmployeeController::listOfProfession', 
+            { 
+                route: app.request.get('_route'), 
+                professionId: profession.id, 
+                page: app.request.get('_route_params').page ?? 1,
+            })) 
+        }}
+    </div>
+</div>
+{% endblock %}

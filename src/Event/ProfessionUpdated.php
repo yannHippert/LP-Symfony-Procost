@@ -4,7 +4,7 @@ namespace App\Event;
 
 use App\Entity\Profession;
 
-final class ProfessionCreated
+final class ProfessionUpdated
 {
     public function __construct(
         private Profession $profession

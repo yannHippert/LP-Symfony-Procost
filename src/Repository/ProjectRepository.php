@@ -79,9 +79,8 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function getPage(int $page): array
     {
-        $ids = $this->_em->createQueryBuilder()
+        $ids = $this->createQueryBuilder('p')
             ->select('p.id')
-            ->from(Project::class, 'p')
             ->orderBy('p.createdAt', 'DESC')
             ->setMaxResults(Project::PAGE_SIZE)
             ->setFirstResult(($page - 1) * Project::PAGE_SIZE)

@@ -1,3 +1,4 @@
 services:
   App\Factory\Employee\EmployeeFactoryInterface: '@App\Factory\Employee\DevEmployeeFactory'
   App\Factory\Project\ProjectFactoryInterface: '@App\Factory\Project\DevProjectFactory'
+  App\Factory\Profession\ProfessionFactoryInterface: '@App\Factory\Profession\DevProfessionFactory'

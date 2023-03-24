@@ -4,6 +4,9 @@ namespace App\EventSubscriber;
 
 use App\Event\EmployeeCreated;
 use App\Event\EmployeeUpdated;
+use App\Event\ProfessionCreated;
+use App\Event\ProfessionDeleted;
+use App\Event\ProfessionUpdated;
 use App\Event\ProjectCreated;
 use App\Event\ProjectDelivered;
 use App\Event\ProjectUpdated;
@@ -39,6 +42,15 @@ final class FlashSubscriber implements EventSubscriberInterface
             ],
             WorktimeCreated::class => [
                 ["onWorktimeCreated"]
+            ],
+            ProfessionCreated::class => [
+                ["onProfessionCreated"]
+            ],
+            ProfessionUpdated::class => [
+                ["onProfessionUpdated"]
+            ],
+            ProfessionDeleted::class => [
+                ["onProfessionDeleted"]
             ]
         ];
     }
@@ -72,6 +84,21 @@ final class FlashSubscriber implements EventSubscriberInterface
     {
         $worktime = $payload->getWorktime();
         $this->addFlash('success', "Temps de production de {$worktime->getDaysSpent()} jours ajouté pour {$worktime->getEmployee()->getFullName()} sur le projet {$worktime->getProject()->getName()} !");
+    }
+
+    public function onProfessionCreated(ProfessionCreated $payload): void 
+    {
+        $this->addFlash('success', "Le métier {$payload->getProfession()->getName()} a été créé !");
+    }
+
+    public function onProfessionUpdated(ProfessionUpdated $payload): void 
+    {
+        $this->addFlash('success', "Le métier {$payload->getProfession()->getName()} a été modifié !");
+    }
+
+    public function onProfessionDeleted(ProfessionDeleted $payload): void 
+    {
+        $this->addFlash('success', "Le métier {$payload->getProfession()->getName()} a été suprimé !");
     }
 
     private function addFlash(String $flashType, String $flashMessage)

@@ -39,15 +39,24 @@ class WorktimeController extends AbstractController
 
     public function listProjectWorktimes(string $route, int $projectId, int $page = 1): Response
     {
-        $worktimes = $this->worktimeRepository->getOfProject($projectId, $page);
+        if($page < 1) {
+             return $this->redirectToRoute($route, ['id' => $projectId]);
+        }
+        
         $totalWorktimes = $this->worktimeRepository->countOfProject($projectId);
+        $numberOfPages = max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE));
+        if($page > $numberOfPages) {
+            return $this->redirectToRoute($route, ['id' => $projectId, 'page' => $numberOfPages]);
+        }
+        
+        $worktimes = $this->worktimeRepository->getOfProject($projectId, $page);
 
         return $this->render('project/components/_worktimes.html.twig', [
             'project_id' => $projectId,
             'worktimes' => $worktimes,
             'pagination' => [
                 'current' => $page,
-                'total' => max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE))
+                'total' =>  $numberOfPages
             ],
             'route' => $route
         ]);

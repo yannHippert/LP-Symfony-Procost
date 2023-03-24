@@ -6,25 +6,29 @@ use App\Repository\ProfessionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProfessionRepository::class)]
 class Profession
 {
+    public const PAGE_SIZE = 10;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Length(min: 2, minMessage: 'Le nom doit contenir au minimum {{ limit }} caractères !')]
+    #[Assert\Length(max: 255, maxMessage: "Le nom doit contenir au maximum {{ limit }} caractères !")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'profession', targetEntity: Employee::class)]
     private Collection $employees;
 
-    public function __construct(
-        string $name
-    ) {
-        $this->name = $name;
+    public function __construct() 
+    {
         $this->employees = new ArrayCollection();
     }
 

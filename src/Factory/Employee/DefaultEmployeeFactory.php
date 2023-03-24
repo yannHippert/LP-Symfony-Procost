@@ -12,8 +12,6 @@ class DefaultEmployeeFactory implements EmployeeFactoryInterface
     {
         $employee = new Employee();
 
-        $employee->setEmploymentDate(new \DateTime('now'));
-
         return $employee;
     }
 }

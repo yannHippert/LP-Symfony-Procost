@@ -47,6 +47,7 @@ class Project
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
         $this->worktimes = new ArrayCollection();
     }
 

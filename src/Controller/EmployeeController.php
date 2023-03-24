@@ -11,15 +11,25 @@ use App\Form\Data\WorktimeData;
 use App\Form\EmployeeType;
 use App\Form\WorktimeDataType;
 use App\Repository\EmployeeRepository;
+use App\Repository\ProfessionRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\WorktimeRepository;
 use Doctrine\ORM\UnexpectedResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
+
+enum EmployeeFromType
+{
+    case Create;
+    case Update;  
+}
 
 class EmployeeController extends AbstractController
 {
@@ -29,7 +39,9 @@ class EmployeeController extends AbstractController
         private WorktimeRepository $workTimeRepository,
         private EmployeeFactoryInterface $employeeFactory,
         private EmployeeManager $employeeManager,
-        private WorktimeManager $workTimeManager
+        private WorktimeManager $workTimeManager,
+        private ProfessionRepository $professionRepository,
+        private RouterInterface $router,
     ) {}
 
     #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
@@ -56,23 +68,32 @@ class EmployeeController extends AbstractController
         }
 
         return $this->render('employee/details.html.twig', [
-            "employee" => $employee,
-            "page" => $page,
-            "form" => $form,
+            'employee' => $employee,
+            'page' => $page,
+            'form' => $form,
         ]);
     }
 
     #[Route('/employees/{page}', name: 'employees_list', methods: 'GET', requirements: ['page' => '\d+'])]
     public function list_employees(int $page = 1): Response
     {
-        $employees = $this->employeeRepository->getPage($page);
+        if($page < 1) {
+            return $this->redirectToRoute('employees_list');
+        }
+
         $totalEmployees = $this->employeeRepository->count([]);
+        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
+        if($page > $numberOfPages) {
+            return $this->redirectToRoute('employees_list', ['page' => $numberOfPages]);
+        }
+
+        $employees = $this->employeeRepository->getPage($page);
 
         return $this->render('employee/list.html.twig', [
-            "employees" => $employees,
+            'employees' => $employees,
             'pagination' => [
                 'current' => $page,
-                'total' => max(1, ceil($totalEmployees / Worktime::PAGE_SIZE))
+                'total' => $numberOfPages
             ]
         ]);
     }
@@ -82,10 +103,10 @@ class EmployeeController extends AbstractController
     {
         $employee = $this->employeeFactory->createEmployee();
 
-        return $this->employee_form($request, $employee, "");
+        return $this->employee_form($request, $employee, EmployeeFromType::Create);
     }
 
-    #[Route('/employee/{id}/update', name: 'employee_update', methods: ['GET', 'POST'], requirements: ['page' => '\d+'])]
+    #[Route('/employee/{id}/update', name: 'employee_update', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function update_employee(Request $request, int $id): Response
     {
         try {
@@ -94,23 +115,63 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException();
         }
         
-        return $this->employee_form($request, $employee, "");
+        return $this->employee_form($request, $employee, EmployeeFromType::Update);
     }
 
-    private function employee_form(Request $request, Employee $employee, string $title): Response
+    private function employee_form(Request $request, Employee $employee, EmployeeFromType $formType): Response
     {
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()) {
-            $this->employeeManager->updateEmployee($employee);
+        switch($formType) {
+            case EmployeeFromType::Create:
+                $action = "addEmployee";
+                $title = "Création d'un employé";
+                break;
+            case EmployeeFromType::Update:
+                $action = "updateEmployee";
+                $title = "Edition d'un employé";
+                break;
+        }
 
-            return $this->redirectToRoute('employee_details', ["id" => $employee->getId()]);
+        if($form->isSubmitted() && $form->isValid()) {
+            if(!method_exists($this->employeeManager, $action)) {
+                throw new HttpException(500, "Method $action not found in ProfessionManager");
+            }
+
+            $this->employeeManager->$action($employee);
+            return $this->redirectToRoute('employee_details', ['id' => $employee->getId()]);
         }
 
         return $this->render('employee/form.html.twig', [
-            "form" => $form->createView(),
-            "title" => $title
+            'form' => $form->createView(),
+            'title' => $title
         ]);
     }
+
+    public function listOfProfession(string $route, int $professionId, int $page = 1): Response
+    {
+        // if($page < 1) {
+        //     return $this->redirectToRoute('professions_list', ['id' => $professionId]);
+        // }
+        
+        $totalEmployees = $this->professionRepository->countEmployees($professionId);
+        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
+        // if($page > $numberOfPages) {
+        //    return $this->redirectToRoute('profession_details', ['id' => $professionId, 'page' => $numberOfPages]);
+        // }
+        
+        $page = min(max(1, $page), $numberOfPages);
+        $employees = $this->employeeRepository->getOfProfession($professionId, max(1, $page));
+
+        return $this->render('profession/components/_employees_table.html.twig', [
+            'profession_id' => $professionId,
+            'employees' => $employees,
+            'pagination' => [
+                'current' => $page,
+                'total' => $numberOfPages
+            ],
+            'route' => $route,
+        ]);
+    } 
 }

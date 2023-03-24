@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Employee;
 use App\Entity\Profession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,28 +40,48 @@ class ProfessionRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Profession[] Returns an array of Profession objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getPage(int $page): array
+    {
+        $ids = $this->createQueryBuilder('p')
+            ->select('p.id')
+            ->orderBy('p.name', 'ASC')
+            ->setMaxResults(Profession::PAGE_SIZE)
+            ->setFirstResult(($page - 1) * Profession::PAGE_SIZE)
+            ->getQuery()
+            ->getArrayResult();
 
-//    public function findOneBySomeField($value): ?Profession
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $qb = $this->createQueryBuilder('p')
+            ->addSelect("e")
+            ->leftJoin('p.employees', 'e')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('p.name', 'ASC');
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getById(int $id): Profession
+    {
+        return $this->createQueryBuilder('p')
+            ->addSelect('e')
+            ->leftJoin('p.employees', 'e')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->orderBy('p.name', 'DESC')
+            ->getQuery()
+            ->getSingleResult();
+    }
+
+    public function countEmployees(int $id): int
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('count(e.id)')
+            ->from(Employee::class, 'e')
+            ->where('e.profession = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
