@@ -43,14 +43,12 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function getById(int $id): Project
     {
-        return $this->createQueryBuilder('p')
-            ->addSelect('w')
-            ->addSelect('e')
-            ->leftJoin('p.worktimes', 'w')
-            ->leftJoin('w.employee', 'e')
-            ->where('p.id = :id')
-            ->setParameter('id', $id)
-            ->orderBy('w.createdAt', 'DESC')
+        $qb = $this->createQueryBuilder('p');
+        $this->addSelectWorktimes($qb);
+        $this->addSelectEmployee($qb);
+        $this->addWhereProject($qb, $id);
+            
+        return $qb
             ->getQuery()
             ->getSingleResult();
     }
@@ -58,8 +56,8 @@ class ProjectRepository extends ServiceEntityRepository
     public function getAllOpen(): array 
     {
         $qb = $this->createQueryBuilder('p')
-            ->where('p.deliveredAt IS NULL')
-            ->orderBy('p.name', 'ASC');
+            ->where('p.deliveredAt IS NULL');
+        $this->addOrderByCreation($qb);
 
         return $qb
             ->getQuery()
@@ -69,32 +67,30 @@ class ProjectRepository extends ServiceEntityRepository
     public function getAllDelivered(): array 
     {
         $qb = $this->createQueryBuilder('p')
-            ->where('p.deliveredAt IS NOT NULL')
-            ->orderBy('p.name', 'ASC');
+            ->where('p.deliveredAt IS NOT NULL');
+        $this->addOrderByCreation($qb);
 
         return $qb
             ->getQuery()
             ->getResult();
     }
 
-    public function getPage(int $page): array
+    public function getPage(int $page, int $pageSize = Project::PAGE_SIZE): array
     {
-        $ids = $this->createQueryBuilder('p')
-            ->select('p.id')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setMaxResults(Project::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * Project::PAGE_SIZE)
+        $idQb = $this->createQueryBuilder('p')
+            ->select('p.id');
+        $this->addOrderByCreation($idQb);
+        $this->addPagination($idQb, $page, $pageSize);
+
+        $ids = $idQb
             ->getQuery()
             ->getArrayResult();
     
-        $qb = $this->createQueryBuilder('p')
-            ->addSelect("w")
-            ->addSelect("e")
-            ->leftJoin('p.worktimes', 'w')
-            ->leftJoin('w.employee', 'e')
-            ->where('p.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('p.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('p');
+        $this->addOrderByCreation($qb);
+        $this->addSelectWorktimes($qb);
+        $this->addSelectEmployee($qb);
+        $this->addWhereIdIn($qb, $ids);
     
         return $qb
             ->getQuery()
@@ -103,11 +99,13 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function countEmployeesOfProject(int $projectId): int
     {
-        return $this->_em->createQueryBuilder()
+        $qb = $this->_em->createQueryBuilder()
             ->select('count(distinct w.employee)')
             ->from(Worktime::class, 'w')
             ->where('w.project = :projectId')
-            ->setParameter('projectId', $projectId)
+            ->setParameter('projectId', $projectId);
+        
+        return $qb
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -128,46 +126,71 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-    
-
-    public function countWorktimesOfProject(int $projectId): int
-    {
-        return $this->_em->createQueryBuilder()
-            ->select('count(w)')
-            ->from(Worktime::class, 'w')
-            ->where('w.project = :projectId')
-            ->setParameter('projectId', $projectId)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
 
     public function getLatest(int $resultCount = 6): array
     {
-        $ids = $this->_em->createQueryBuilder()
+        $idQb = $this->createQueryBuilder('p')
             ->select('p.id')
-            ->from(Project::class, 'p')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setMaxResults($resultCount)
+            ->setMaxResults($resultCount);
+        $this->addOrderByCreation($idQb);
+        
+        $ids = $idQb
             ->getQuery()
             ->getArrayResult();
 
-        $qb = $this->createQueryBuilder('p')
-            ->addSelect("w")
-            ->addSelect("e")
-            ->leftJoin('p.worktimes', 'w')
-            ->leftJoin('w.employee', 'e')
-            ->where('p.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('p.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('p');
+        $this->addOrderByCreation($qb);
+        $this->addSelectWorktimes($qb);
+        $this->addSelectEmployee($qb);
+        $this->addWhereIdIn($qb, $ids);
 
         return $qb
             ->getQuery()
             ->getResult();
     }
 
-    private function addWhereProjectClause(QueryBuilder $qb, int $projectId): void
+    private function addSelectWorktimes(QueryBuilder $qb): void
     {
-        $qb->where('w.project = :projectId')
+        $qb
+            ->addSelect("w")
+            ->leftJoin('p.worktimes', 'w');
+    }
+
+    private function addSelectEmployee(QueryBuilder $qb): void
+    {
+        $qb
+            ->addSelect("e")
+            ->leftJoin('w.employee', 'e');
+    }
+
+    private function addWhereProject(QueryBuilder $qb, int $projectId): void
+    {
+        $qb
+            ->where('w.project = :projectId')
             ->setParameter('projectId', $projectId);
     }
+
+    private function addWhereIdIn(QueryBuilder $qb, array $projectIds): void
+    {
+        $qb
+            ->where('p.id IN (:projectIds)')
+            ->setParameter('projectIds', $projectIds);
+    }
+
+    private function addOrderByCreation(QueryBuilder $qb, bool $isDescending = true): void
+    {
+        $qb
+            ->orderBy('p.createdAt', $isDescending ? 'DESC' : 'ASC');
+    }
+
+    private function addPagination(QueryBuilder $qb, ?int $page, int $pageSize = Worktime::PAGE_SIZE): void
+    {
+        if($page != null) {
+            $qb
+                ->setMaxResults($pageSize)
+                ->setFirstResult(($page - 1) * $pageSize);
+        }
+    }
+
 }
+

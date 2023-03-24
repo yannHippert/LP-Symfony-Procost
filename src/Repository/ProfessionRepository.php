@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\Profession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,48 +41,67 @@ class ProfessionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getPage(int $page): array
+    public function getPage(int $page = 1, int $pageSize = Profession::PAGE_SIZE): array
     {
-        $ids = $this->createQueryBuilder('p')
-            ->select('p.id')
-            ->orderBy('p.name', 'ASC')
-            ->setMaxResults(Profession::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * Profession::PAGE_SIZE)
-            ->getQuery()
-            ->getArrayResult();
+        $idQb = $this->createQueryBuilder('p')
+            ->select('p.id');
+        $this->addOrderByName($idQb);
+        $this->addPagination($idQb, $page, $pageSize);
 
-        $qb = $this->createQueryBuilder('p')
-            ->addSelect("e")
-            ->leftJoin('p.employees', 'e')
-            ->where('p.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('p.name', 'ASC');
+        $ids = $idQb->getQuery()->getArrayResult();
 
-        return $qb
-            ->getQuery()
-            ->getResult();
+        $qb = $this->createQueryBuilder('p');
+        $this->addSelectEmployees($qb);
+        $this->addWhereIdIn($qb, $ids);
+        $this->addOrderByName($qb);
+
+        return $qb->getQuery()->getResult();
     }
 
-    public function getById(int $id): Profession
+    public function getById(int $professionId): Profession
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p');
+        $this->addSelectEmployees($qb);
+        $this->addOrderByName($qb);
+        $this->addWhereProfession($qb, $professionId);
+
+        return $qb->getQuery()->getSingleResult();
+    }
+
+    private function addSelectEmployees(QueryBuilder $qb): void
+    {
+        $qb
             ->addSelect('e')
-            ->leftJoin('p.employees', 'e')
-            ->where('p.id = :id')
-            ->setParameter('id', $id)
-            ->orderBy('p.name', 'DESC')
-            ->getQuery()
-            ->getSingleResult();
+            ->leftJoin('p.employees', 'e');
     }
 
-    public function countEmployees(int $id): int
+    private function addWhereProfession(QueryBuilder $qb, int $professionId): void
     {
-        return $this->_em->createQueryBuilder()
-            ->select('count(e.id)')
-            ->from(Employee::class, 'e')
-            ->where('e.profession = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getSingleScalarResult();
+        $qb
+            ->where('e.profession = :professionId')
+            ->setParameter('professionId', $professionId);
+    }
+
+    private function addWhereIdIn(QueryBuilder $qb, array $professionIds): void
+    {
+        $qb
+            ->where('p.id IN (:professionIds)')
+            ->setParameter('professionIds', $professionIds);
+    }
+
+    private function addOrderByName(QueryBuilder $qb, bool $isDescending = false): void
+    {
+        $qb
+            ->orderBy('p.name', $isDescending ? "DESC" : 'ASC');
+    }
+
+    private function addPagination(QueryBuilder $qb, ?int $page, int $pageSize = Profession::PAGE_SIZE): void
+    {
+        if($page == null) return;
+        
+        $qb
+            ->setMaxResults($pageSize)
+            ->setFirstResult(($page - 1) * $pageSize);
+        
     }
 }

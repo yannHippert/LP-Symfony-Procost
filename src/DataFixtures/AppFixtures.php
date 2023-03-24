@@ -6,6 +6,7 @@ use App\Entity\Employee;
 use App\Entity\Profession;
 use App\Entity\Worktime;
 use App\Factory\Employee\EmployeeFactoryInterface;
+use App\Factory\Profession\ProfessionFactoryInterface;
 use App\Factory\Project\ProjectFactoryInterface;
 use App\Form\Data\WorktimeData;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -18,7 +19,6 @@ class AppFixtures extends Fixture
     public const PROFESSION_COUNT = 6;
     public const EMPLOYEE_COUNT = 32;
     public const PROJECT_COUNT = 72;
-
     public const PROJECT_DELIVERED_PERCENTAGE = 75;
 
     private $manager;
@@ -27,6 +27,7 @@ class AppFixtures extends Fixture
     public function __construct(
         private EmployeeFactoryInterface $employeeFactory,
         private ProjectFactoryInterface $projectFactory,
+        private ProfessionFactoryInterface $professionFactory,
     ){}
 
     public function load(ObjectManager $manager): void
@@ -43,9 +44,23 @@ class AppFixtures extends Fixture
 
     private function loadProfessions(): void
     {
-        for($i = 0; $i < self::PROFESSION_COUNT;  $i++) {
-            $profession = new Profession($this->faker->jobTitle());
+        $professionNames = [
+            ["Web designer"], 
+            ["SEO Manager"], 
+            ["Web Developer"], 
+            ["UI/UX Designer"], 
+            ["Backend Developer"],
+            ["Scrum Master"],
+            ["Project Manager"],
+        ];
 
+        for($i = 0; $i < max(self::PROFESSION_COUNT, count($professionNames));  $i++) {
+            if($i > count($professionNames)) {
+                $profession = $this->professionFactory->createProfession();
+            } else {
+                $profession = new Profession();
+                $profession->setName($professionNames[$i][0]);
+            }
             $this->manager->persist($profession);
             $this->addReference(Profession::class . $i, $profession);
         }
@@ -77,15 +92,15 @@ class AppFixtures extends Fixture
                     $this->getReference(Employee::class . mt_rand(0, self::EMPLOYEE_COUNT - 1))
                 );
                 $worktime->setCreatedAt($this->faker->dateTimeBetween(
-                    $project->getCreatedAt()->format("Y-M-d H:m:s"), 
-                    "now"
+                    $project->getCreatedAt()->format('Y-M-d H:m:s'), 
+                    'now'
                 ));
                 $sum += $worktime->getTotalPrice();
                 $this->manager->persist($worktime);
             }
 
             if(random_int(0, 100) <= self::PROJECT_DELIVERED_PERCENTAGE) {
-                $project->setDeliveredAt($this->faker->dateTimeBetween($project->getCreatedAt()->format("Y-M-d H:m:s"), 'now'));
+                $project->setDeliveredAt($this->faker->dateTimeBetween($project->getCreatedAt()->format('Y-M-d H:m:s'), 'now'));
             }
 
             $this->manager->persist($project);

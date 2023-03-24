@@ -40,63 +40,96 @@ class EmployeeRepository extends ServiceEntityRepository
         }
     }
 
-    public function getPage(int $page): array
+    public function getPage(int $page = 1, int $pageSize = Employee::PAGE_SIZE): array
     {
-        $qb = $this->createQueryBuilder('e')
-            ->orderBy('e.id', 'ASC')
-            ->addSelect('p')
-            ->leftJoin('e.profession', 'p')
-            ->setMaxResults(Employee::PAGE_SIZE)
-            ->setFirstResult(($page - 1) * Employee::PAGE_SIZE);
+        $qb = $this->createQueryBuilder('e');
+        $this->addSelectProfession($qb);
+        $this->addOrderByEmploymentDate($qb);
+        $this->addPagination($qb, $page, $pageSize);
 
         return $qb
             ->getQuery()
             ->getResult();
     }
 
-    public function getById(int $id): Employee
+    public function getById(int $employeeId): Employee
     {
-        return $this->createQueryBuilder('e')
-            ->addSelect('p')
-            ->leftJoin('e.profession', 'p')
-            ->where('e.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getSingleResult();
+        $qb = $this->createQueryBuilder('e');
+        $this->addSelectProfession($qb);
+        $this->addWhereEmployee($qb, $employeeId);
+
+        return $qb->getQuery()->getSingleResult();
     }
 
-    public function getBest() 
+    public function getBest(): Employee
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.worktimes', 'w')
             ->groupBy('e')
-            ->orderBy('SUM(w.daysSpent * e.dailySalary)', "DESC")
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleResult();
+            ->orderBy('SUM(w.daysSpent * e.dailySalary)', "DESC");
+            
+        return $qb->setMaxResults(1)->getQuery()->getSingleResult();
+    }
+
+    public function countOfProfession(int $professionId): int
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('count(e.id)');
+        $this->addWhereProfession($qb, $professionId);
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     public function getOfProfession(int $professionId, ?int $page): array
     {
-        $qb = $this->createQueryBuilder('e')
-            ->where('e.profession = :professionId')
-            ->setParameter('professionId', $professionId)
-            ->orderBy('e.lastName', 'ASC');
-        
+        $qb = $this->createQueryBuilder('e');
+        $this->addWhereProfession($qb, $professionId);
+        $this->addOrderByLastName($qb);
         $this->addPagination($qb, $page);
 
-        return $qb
-            ->getQuery()
-            ->getResult();
+        return $qb->getQuery()->getResult();
     }
 
-    private function addPagination(QueryBuilder $qb, ?int $page): void
+    private function addSelectProfession(QueryBuilder $qb): void
     {
-        if($page != null) {
-            $qb
-                ->setMaxResults(Employee::PAGE_SIZE)
-                ->setFirstResult(($page - 1) * Employee::PAGE_SIZE);
-        }
+        $qb
+            ->addSelect('p')
+            ->leftJoin('e.profession', 'p');
+    }
+
+    private function addWhereEmployee(QueryBuilder $qb, int $employeeId): void
+    {
+        $qb
+            ->where('e.id = :employeeId')
+            ->setParameter('employeeId', $employeeId);
+    }
+
+    private function addWhereProfession(QueryBuilder $qb, int $professionId): void
+    {
+        $qb
+            ->where('e.profession = :professionId')
+            ->setParameter('professionId', $professionId);
+    }
+
+    private function addOrderByLastName(QueryBuilder $qb, bool $isDescending = false): void
+    {
+        $qb
+            ->orderBy('p.lastName', $isDescending ? "DESC" : "ASC");
+    }
+
+    private function addOrderByEmploymentDate(QueryBuilder $qb, bool $isDescending = true): void
+    {
+        $qb
+            ->orderBy('e.employmentDate', $isDescending ? "DESC" : "ASC");
+    }
+
+    private function addPagination(QueryBuilder $qb, ?int $page, int $pageSize = Employee::PAGE_SIZE): void
+    {
+        if($page == null) return;
+
+        $qb
+            ->setMaxResults($pageSize)
+            ->setFirstResult(($page - 1) * $pageSize);
     }
 
 }

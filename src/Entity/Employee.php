@@ -43,12 +43,13 @@ class Employee
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
+    #[Assert\Type(type: "numeric", message: 'Ce champ doit être un nombre !')]
     #[Assert\Positive(message: 'Le salaire journalier ne peux pas être negatif !')]
     private ?float $dailySalary = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide !')]
-    #[Assert\Type("\DateTimeInterface", message: 'Ce champ doit être une date !')]
+    #[Assert\Type(type: "\DateTimeInterface", message: 'Ce champ doit être une date !')]
     #[Assert\LessThanOrEqual('today', message: "La date d'embauche ne peux pas être supérieur à la date actuelle !")]
     private ?\DateTimeImmutable $employmentDate = null;
 
