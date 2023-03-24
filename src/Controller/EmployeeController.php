@@ -155,7 +155,7 @@ class EmployeeController extends AbstractController
         //     return $this->redirectToRoute('professions_list', ['id' => $professionId]);
         // }
         
-        $totalEmployees = $this->professionRepository->countEmployees($professionId);
+        $totalEmployees = $this->employeeRepository->countOfProfession($professionId);
         $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
         // if($page > $numberOfPages) {
         //    return $this->redirectToRoute('profession_details', ['id' => $professionId, 'page' => $numberOfPages]);

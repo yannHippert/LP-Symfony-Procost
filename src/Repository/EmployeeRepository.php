@@ -114,7 +114,7 @@ class EmployeeRepository extends ServiceEntityRepository
     private function addOrderByLastName(QueryBuilder $qb, bool $isDescending = false): void
     {
         $qb
-            ->orderBy('p.lastName', $isDescending ? "DESC" : "ASC");
+            ->orderBy('e.lastName', $isDescending ? "DESC" : "ASC");
     }
 
     private function addOrderByEmploymentDate(QueryBuilder $qb, bool $isDescending = true): void
