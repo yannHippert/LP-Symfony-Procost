@@ -7,12 +7,12 @@
 <div class="d-flex align-items-center justify-content-center vh-100">
     <div class="text-center">
         <i class="fa-solid fa-file-excel" style="font-size: 5rem;"></i>
-        <h1 class="display-1 fw-bold">404</h1>
-        <p class="fs-3"> <span class="text-danger">Opps!</span> Page not found.</p>
+        <h1 class="display-1 fw-bold">500</h1>
+        <p class="fs-3"> <span class="text-danger">Opps!</span> Internal server error.</p>
         <p class="lead">
-            The page you’re looking for doesn’t exist.
+            There has been an internal server error.
         </p>
-        <a href={{ path('main_homepage') }} class="btn btn-primary">Go Home</a>
+        <a href={{ path('main_dashboard') }} class="btn btn-primary">Go Home</a>
     </div>
 </div>
 {% endblock %}

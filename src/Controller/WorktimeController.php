@@ -18,7 +18,7 @@ class WorktimeController extends AbstractController
     public function listProjectWorktimes(string $route, int $projectId, int $page = 1): Response
     {
         if($page < 1) {
-             return $this->redirectToRoute($route, ['id' => $projectId]);
+            return $this->redirectToRoute($route, ['id' => $projectId]);
         }
         
         $totalWorktimes = $this->worktimeRepository->countOfProject($projectId);

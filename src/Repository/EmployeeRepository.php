@@ -80,12 +80,12 @@ class EmployeeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function getOfProfession(int $professionId, ?int $page): array
+    public function getOfProfession(int $professionId, ?int $page, int $pageSize = Employee::PAGE_SIZE): array
     {
         $qb = $this->createQueryBuilder('e');
         $this->addWhereProfession($qb, $professionId);
         $this->addOrderByLastName($qb);
-        $this->addPagination($qb, $page);
+        $this->addPagination($qb, $page, $pageSize);
 
         return $qb->getQuery()->getResult();
     }
