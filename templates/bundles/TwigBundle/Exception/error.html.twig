@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}Page not found - {{ parent() }}{% endblock %}
+{% block title %}Error - {{ parent() }}{% endblock %}
 
 {% block content %}
 <!-- Page Content -->
@@ -10,10 +10,10 @@
         <h1 class="display-1 fw-bold">{{ status_code }}</h1>
         <p class="fs-3"> <span class="text-danger">Opps!</span> Something went wrong.</p>
         <p class="lead">
-            There seems to be an error on our part.<br>
-            Sorry for any inconvenience caused.
+            Il semble y avoir une erreur de notre part.<br>
+            Désolé pour tout inconvénient causé.
         </p>
-        <a href={{ path('main_dashboard') }} class="btn btn-primary">Go Home</a>
+        <a href={{ path('main_dashboard') }} class="btn btn-primary">Dashboard</a>
     </div>
 </div>
 {% endblock %}

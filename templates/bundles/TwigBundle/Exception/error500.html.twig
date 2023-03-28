@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}Page not found - {{ parent() }}{% endblock %}
+{% block title %}Internal server error - {{ parent() }}{% endblock %}
 
 {% block content %}
 <!-- Page Content -->
@@ -10,9 +10,10 @@
         <h1 class="display-1 fw-bold">500</h1>
         <p class="fs-3"> <span class="text-danger">Opps!</span> Internal server error.</p>
         <p class="lead">
-            There has been an internal server error.
+            Il semble y avoir une erreur de notre part.<br>
+            Désolé pour tout inconvénient causé
         </p>
-        <a href={{ path('main_dashboard') }} class="btn btn-primary">Go Home</a>
+        <a href={{ path('main_dashboard') }} class="btn btn-primary">Dashboard</a>
     </div>
 </div>
 {% endblock %}

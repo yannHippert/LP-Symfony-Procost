@@ -6,9 +6,11 @@ use App\Repository\ProfessionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProfessionRepository::class)]
+#[UniqueEntity('name', message: "Il semble que ce métier existe déjà !")]
 class Profession
 {
     public const PAGE_SIZE = 10;

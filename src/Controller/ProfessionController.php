@@ -91,7 +91,7 @@ class ProfessionController extends AbstractController
     }
 
     #[Route('/profession/{id}/delete', name: 'profession_delete', methods: 'GET', requirements: ['id' => '\d+'])]
-    public function delete_profession(Request $request, int $id): Response
+    public function delete_profession(int $id): Response
     {
         try {
             $profession = $this->professionRepository->getById($id);
