@@ -5,7 +5,7 @@
 {% block content %}
 <div class="app-title">
     <div>
-        <h1><i class="fa fa-laptop"></i>&nbsp;Suivi de {{ project.name }}</h1>
+        <h1><i class="fa fa-laptop"></i>&nbsp;{{ project.name }}</h1>
     </div>
     <ul class="app-breadcrumb breadcrumb">
         <li class="breadcrumb-item">
@@ -14,7 +14,7 @@
         <li class="breadcrumb-item">
             <a href={{ path('projects_list') }}>Projets</a>
         </li>
-        <li class="breadcrumb-item">Suivi de {{ project.name }}</li>
+        <li class="breadcrumb-item">{{ project.name }}</li>
     </ul>
 </div>
 
@@ -39,7 +39,9 @@
                     </tr>
                     <tr>
                         <th>Coûts de production</th>
-                        <td class={{ project.price < project.productionCost ? "text-danger" }}>{{ project.productionCost|format_currency('EUR') }}</td>
+                        <td class={{ project.price < project.productionCost ? "text-danger" }}>
+                            {{ project.productionCost|format_currency('EUR') }}
+                        </td>
                     </tr>
                     <tr>
                         <th>Nbr d'employés ayant travaillé</th>

@@ -31,32 +31,13 @@ class ProfessionController extends AbstractController
         private ProfessionManager $professionManager,
     ) {}
 
-    #[Route('/profession/{id}/{page}', name: 'profession_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
-    public function details(int $id, int $page = 1): Response
-    {
-        try {
-            $profession = $this->professionRepository->getById($id);
-        } catch(UnexpectedResultException) {
-            throw new NotFoundHttpException();
-        }
-
-        return $this->render('profession/details.html.twig', [
-            'profession' => $profession,
-            'page' => $page,
-        ]);
-    }
-
     #[Route('/professions/{page}', name: 'professions_list', methods: 'GET', requirements: ['page' => '\d+'])]
     public function list_professions(int $page = 1): Response
     {
-        if($page < 1) {
-            return $this->redirectToRoute('professions_list', ['page' => 1]);
-        }
-
         $totalProfessions = $this->professionRepository->count([]);
         $numberOfPages = max(1, ceil($totalProfessions / Profession::PAGE_SIZE));
-        if($page > $numberOfPages) {
-            return $this->redirectToRoute('professions_list', ['page' => $numberOfPages]);
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
         }
 
         $professions = $this->professionRepository->getPage($page);
@@ -76,6 +57,21 @@ class ProfessionController extends AbstractController
         $profession = $this->professionFactory->createProfession();
 
         return $this->profession_form($request, $profession, ProfessionFormType::Create);
+    }
+
+    #[Route('/profession/{id}/{page}', name: 'profession_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
+    public function details(int $id, int $page = 1): Response
+    {
+        try {
+            $profession = $this->professionRepository->getById($id);
+        } catch(UnexpectedResultException) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->render('profession/details.html.twig', [
+            'profession' => $profession,
+            'page' => $page,
+        ]);
     }
 
     #[Route('/profession/{id}/update', name: 'profession_update', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
@@ -101,7 +97,7 @@ class ProfessionController extends AbstractController
 
         if(count($profession->getEmployees()) > 0) {
             throw new AccessDeniedHttpException();
-        } 
+        }
 
         $this->professionManager->deleteProfession($profession);
 

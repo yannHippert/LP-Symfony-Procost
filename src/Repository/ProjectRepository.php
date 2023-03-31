@@ -97,19 +97,6 @@ class ProjectRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function countEmployeesOfProject(int $projectId): int
-    {
-        $qb = $this->_em->createQueryBuilder()
-            ->select('count(distinct w.employee)')
-            ->from(Worktime::class, 'w')
-            ->where('w.project = :projectId')
-            ->setParameter('projectId', $projectId);
-        
-        return $qb
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
     public function countProfitable()
     {
         $subquery = $this->_em->createQueryBuilder()
@@ -119,10 +106,24 @@ class ProjectRepository extends ServiceEntityRepository
             ->where('w.project = p.id')
             ->getDQL();
     
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->where('p.deliveredAt IS NOT NULL')
-            ->andWhere("p.price < ($subquery)")
+            ->andWhere("p.price > ($subquery)");
+
+        return $qb
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countOpen()
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.deliveredAt IS NULL');
+        $this->addOrderByCreation($qb);
+
+        return $qb
             ->getQuery()
             ->getSingleScalarResult();
     }

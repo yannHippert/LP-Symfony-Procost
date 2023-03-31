@@ -26,7 +26,7 @@
             <div class="row mt-4">
                 <div class="offset-md-4 col-md-8">
                     {% for form_field in ["name", "description"] %}
-                        {% include 'components/form_field.html.twig' with { form_field: form_field } %}
+                        {% include 'components/_form_field.html.twig' %}
                     {% endfor %}
                 </div>
             </div>
@@ -39,7 +39,7 @@
             <div class="row mt-4">
                 <div class="offset-md-4 col-md-8">
                     {% for form_field in ["price"] %}
-                        {% include 'components/form_field.html.twig' with { form_field: form_field } %}
+                        {% include 'components/_form_field.html.twig' %}
                     {% endfor %}
                 </div>
             </div>

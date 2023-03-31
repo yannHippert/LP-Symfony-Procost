@@ -78,7 +78,7 @@ class ProfessionRepository extends ServiceEntityRepository
     private function addWhereProfession(QueryBuilder $qb, int $professionId): void
     {
         $qb
-            ->where('e.profession = :professionId')
+            ->where('p.id = :professionId')
             ->setParameter('professionId', $professionId);
     }
 

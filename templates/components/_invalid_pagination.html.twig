@@ -1,0 +1,30 @@
+<!--
+parameters:
+{
+    title: The title/text of the component
+    route: The name of the route to navigate to
+    id: The id route has an id parameter
+    last_page: The last page of the pagination
+}
+-->
+
+{% set id = id ?? null %}
+{% set current_path = app.request.get('_route') ?? route %}
+{% set last_page = last_page ?? 1 %}
+
+<div class="tile pb-5">
+    <h3 class="tile-title">{{ title }}</h3>
+    <hr/>
+    <div class="text-center">
+        <h4 class="display-2 fw-bold">404</h4>
+        <p class="fs-3"> <span class="text-danger">Opps!</span> Invalid pagination parameter</p>
+        <p class="lead">
+            La page que vous recherchez n'existe pas.
+        </p>
+        <a href={{ path(current_path, {page: 1, id: id}) }} class="btn btn-primary">Première page</a>
+        {% if last_page != 1 %}
+            <a href={{ path(current_path, {page: last_page, id: id}) }} class="btn btn-primary">Dernière page</a>
+        {% endif %}
+    </div>
+    <hr/>
+</div>

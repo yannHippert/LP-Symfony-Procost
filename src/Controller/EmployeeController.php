@@ -44,6 +44,34 @@ class EmployeeController extends AbstractController
         private RouterInterface $router,
     ) {}
 
+    #[Route('/employees/{page}', name: 'employees_list', methods: 'GET', requirements: ['page' => '\d+'])]
+    public function list_employees(int $page = 1): Response
+    {
+        $totalEmployees = $this->employeeRepository->count([]);
+        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
+        }
+
+        $employees = $this->employeeRepository->getPage($page);
+
+        return $this->render('employee/list.html.twig', [
+            'employees' => $employees,
+            'pagination' => [
+                'current' => $page,
+                'total' => $numberOfPages
+            ]
+        ]);
+    }
+
+    #[Route('/employee/create', name: 'employee_create', methods: ['GET', 'POST'])]
+    public function create_employee(Request $request): Response
+    {
+        $employee = $this->employeeFactory->createEmployee();
+
+        return $this->employee_form($request, $employee, EmployeeFromType::Create);
+    }
+
     #[Route('/employee/{id}/{page}', name: 'employee_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: ['GET', 'POST'])]
     public function details(Request $request, int $id, int $page = 1): Response
     {
@@ -72,38 +100,6 @@ class EmployeeController extends AbstractController
             'page' => $page,
             'form' => $form,
         ]);
-    }
-
-    #[Route('/employees/{page}', name: 'employees_list', methods: 'GET', requirements: ['page' => '\d+'])]
-    public function list_employees(int $page = 1): Response
-    {
-        if($page < 1) {
-            return $this->redirectToRoute('employees_list');
-        }
-
-        $totalEmployees = $this->employeeRepository->count([]);
-        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
-        if($page > $numberOfPages) {
-            return $this->redirectToRoute('employees_list', ['page' => $numberOfPages]);
-        }
-
-        $employees = $this->employeeRepository->getPage($page);
-
-        return $this->render('employee/list.html.twig', [
-            'employees' => $employees,
-            'pagination' => [
-                'current' => $page,
-                'total' => $numberOfPages
-            ]
-        ]);
-    }
-
-    #[Route('/employee/create', name: 'employee_create', methods: ['GET', 'POST'])]
-    public function create_employee(Request $request): Response
-    {
-        $employee = $this->employeeFactory->createEmployee();
-
-        return $this->employee_form($request, $employee, EmployeeFromType::Create);
     }
 
     #[Route('/employee/{id}/update', name: 'employee_update', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
@@ -151,15 +147,16 @@ class EmployeeController extends AbstractController
 
     public function listOfProfession(string $route, int $professionId, int $page = 1): Response
     {
-        // if($page < 1) {
-        //     return $this->redirectToRoute('professions_list', ['id' => $professionId]);
-        // }
-        
         $totalEmployees = $this->employeeRepository->countOfProfession($professionId);
         $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
-        // if($page > $numberOfPages) {
-        //    return $this->redirectToRoute('profession_details', ['id' => $professionId, 'page' => $numberOfPages]);
-        // }
+        if($page < 1 || $numberOfPages < $page) {
+            return $this->render('components/_invalid_pagination.html.twig', [
+                'title' => 'Employés',
+                'id' => $professionId,
+                'route' => $route,
+                'last_page' => $numberOfPages
+            ]);
+        }
         
         $page = min(max(1, $page), $numberOfPages);
         $employees = $this->employeeRepository->getOfProfession($professionId, max(1, $page));
@@ -174,4 +171,19 @@ class EmployeeController extends AbstractController
             'route' => $route,
         ]);
     } 
+
+    public function bestEmployeeCard(): Response
+    {
+        return $this->employeeCard();
+    }
+
+    public function employeeCard(?int $employeeId = null): Response
+    {
+        $employee = $employeeId ? $this->employeeRepository->getById($employeeId) : $this->employeeRepository->getBest();
+
+        return $this->render('main/components/_employee_card.html.twig', [
+            'employee' => $employee,
+            'title' => $employeeId ? "Employé" : "Top employé"
+        ]);
+    }
 }

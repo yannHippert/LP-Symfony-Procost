@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Employee;
+use App\Entity\Worktime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -69,6 +70,19 @@ class EmployeeRepository extends ServiceEntityRepository
             ->orderBy('SUM(w.daysSpent * e.dailySalary)', "DESC");
             
         return $qb->setMaxResults(1)->getQuery()->getSingleResult();
+    }
+
+    public function countofProject(int $projectId): int
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('count(distinct w.employee)')
+            ->from(Worktime::class, 'w')
+            ->where('w.project = :projectId')
+            ->setParameter('projectId', $projectId);
+        
+        return $qb
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function countOfProfession(int $professionId): int

@@ -21,9 +21,9 @@
             <thead>
                 <tr>
                     <th>Nom</th>
+                    <th>Date de création</th>
                     <th>Prix de vente</th>
                     <th>Coûts de production</th>
-                    <th>Date de création</th>
                     <th>Est livré</th>
                     <th>Actions</th>
                 </tr>
@@ -34,9 +34,11 @@
                         <td>
                             <a href={{ path("project_details", { id: project.id })}}>{{ project.name }}</a>
                         </td>
-                        <td>{{ project.price|format_currency('EUR') }}</td>
-                        <td>{{ project.productionCost|format_currency('EUR') }}</td>
                         <td>{{ project.createdAt|date("m/Y", "Europe/Paris") }}</td>
+                        <td>{{ project.price|format_currency('EUR') }}</td>
+                        <td class={{ project.price < project.productionCost ? "text-danger" }}>
+                            {{ project.productionCost|format_currency('EUR') }}
+                        </td>
                         <td>
                             {{ 
                                 project.deliveredAt is null

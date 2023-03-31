@@ -6,6 +6,7 @@ use App\Entity\Project;
 use App\EventManager\ProjectManager;
 use App\Factory\Project\ProjectFactoryInterface;
 use App\Form\ProjectType;
+use App\Repository\EmployeeRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\WorktimeRepository;
 use Doctrine\ORM\UnexpectedResultException;
@@ -13,17 +14,53 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+
+enum ProjectFromType
+{
+    case Create;
+    case Update;  
+}
 
 class ProjectController extends AbstractController
 {
     public function __construct(
         private ProjectRepository $projectRepository,
+        private EmployeeRepository $employeeRepository,
         private WorktimeRepository $workTimeRepository,
         private ProjectFactoryInterface $projectFactory,
         private ProjectManager $projectManager
     ) {}
+
+    #[Route('/projects/{page}', name: 'projects_list', requirements: ['page' => '\d+'], methods: 'GET')]
+    public function list_projects(int $page = 1): Response
+    {
+        $totalProjects = $this->projectRepository->count([]);
+        $numberOfPages = max(1, ceil($totalProjects / Project::PAGE_SIZE));
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
+        }
+
+        $projects = $this->projectRepository->getPage($page);
+
+        return $this->render('project/list.html.twig', [
+            "projects" => $projects,
+            'pagination' => [
+                'current' => $page,
+                'total' => $numberOfPages
+            ]
+        ]);
+    }
+
+    #[Route('/project/create', name: 'project_create', methods: ['GET', 'POST'])]
+    public function create_project(Request $request): Response
+    {
+        $project = $this->projectFactory->createProject();
+
+        return $this->project_form($request, $project, ProjectFromType::Create);
+    }
 
     #[Route('/project/{id}/{page}', name: 'project_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
     public function details(int $id, int $page = 1): Response
@@ -34,7 +71,7 @@ class ProjectController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $employeeCount = $this->projectRepository->countEmployeesOfProject($id);
+        $employeeCount = $this->employeeRepository->countOfProject($id);
 
         return $this->render('project/details.html.twig', [
             "project" => $project,
@@ -42,30 +79,6 @@ class ProjectController extends AbstractController
             "employeeCount" => $employeeCount,
         ]);
     }
-
-    #[Route('/projects/{page}', name: 'projects_list', requirements: ['page' => '\d+'], methods: 'GET')]
-    public function list_projects(int $page = 1): Response
-    {
-        $projects = $this->projectRepository->getPage($page);
-        $totalProjects = $this->projectRepository->count([]);
-
-        return $this->render('project/list.html.twig', [
-            "projects" => $projects,
-            'pagination' => [
-                'current' => $page,
-                'total' => max(1, ceil($totalProjects / Project::PAGE_SIZE))
-            ]
-        ]);
-    }
-
-    #[Route('/project/create', name: 'project_create', methods: ['GET', 'POST'])]
-    public function create_project(Request $request): Response
-    {
-        $project = $this->projectFactory->createProject();
-
-        return $this->project_form($request, $project, "Création d'un project");
-    }
-
     
     #[Route('/project/{id}/update', name: 'project_update', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function update_project(Request $request, int $id): Response
@@ -80,11 +93,11 @@ class ProjectController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        return $this->project_form($request, $project, "Edition d'un project");
+        return $this->project_form($request, $project, ProjectFromType::Update);
     }
 
     #[Route('/project/{id}/deliver', name: 'project_deliver', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function deliver_project(Request $request, int $id): Response
+    public function deliver_project(int $id): Response
     {
         try {
             $project = $this->projectRepository->getById($id);
@@ -102,10 +115,31 @@ class ProjectController extends AbstractController
         return $this->redirectToRoute('project_details', ["id" => $project->getId()]);
     }
 
-    private function project_form(Request $request, Project $project, string $title): Response
+    private function project_form(Request $request, Project $project, ProjectFromType $formType): Response
     {
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
+
+        switch($formType) {
+            case EmployeeFromType::Create:
+                $action = "addProject";
+                $title = "Création d'un projet";
+                break;
+            case EmployeeFromType::Update:
+                $action = "updateProject";
+                $title = "Edition d'un projet";
+                break;
+        }
+
+        if($form->isSubmitted() && $form->isValid()) {
+            if(!method_exists($this->projectManager, $action)) {
+                throw new HttpException(500, "Method $action not found in ProjectManager");
+            }
+
+            $this->projectManager->$action($project);
+
+            return $this->redirectToRoute('project_details', ["id" => $project->getId()]);
+        }
 
         if($form->isSubmitted() && $form->isValid()) {
             $this->projectManager->addProject($project);
@@ -116,6 +150,16 @@ class ProjectController extends AbstractController
         return $this->render('project/form.html.twig', [
             "form" => $form->createView(),
             "title" => $title
+        ]);
+    }
+
+    public function listLatest(): Response
+    {
+        $latestProjects = $this->projectRepository->getLatest(6);
+
+        return $this->render('main/components/_projects_table.html.twig', [
+            'projects' => $latestProjects,
+            'title' => 'Les derniers projets'
         ]);
     }
 

@@ -18,7 +18,9 @@
                     </td>
                     <td>{{ project.createdAt|date("d/M/Y") }}</td>
                     <td>{{ project.price|format_currency('EUR') }}</td>
-                    <td>{{ project.productionCost|format_currency('EUR') }}</td>
+                    <td class={{ project.price < project.productionCost ? "text-danger" }}>
+                        {{ project.productionCost|format_currency('EUR') }}
+                    </td>
                     <td>
                         {{ 
                             project.deliveredAt is null

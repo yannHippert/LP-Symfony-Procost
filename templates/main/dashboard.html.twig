@@ -84,17 +84,17 @@
                 </div>
             </div>
             <div class="col-md-4">
-                {{ render(controller('App\\Controller\\MainController::bestEmployeeCard')) }}
+                {{ render(controller('App\\Controller\\EmployeeController::bestEmployeeCard')) }}
             </div>
         </div>
 
         <hr />
 
-        {{ render(controller('App\\Controller\\MainController::latestProjectsTable')) }}
+        {{ render(controller('App\\Controller\\ProjectController::listLatest')) }}
     </div>
 
     <div class="col-md-3">
-        {{ render(controller('App\\Controller\\MainController::latestWorktimesList')) }}
+        {{ render(controller('App\\Controller\\WorktimeController::listLatest')) }}
     </div>
 </div>
 {% endblock %}

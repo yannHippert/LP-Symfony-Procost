@@ -22,11 +22,9 @@ final class MainController extends AbstractController
     #[Route('/', name: 'main_dashboard', methods: 'GET')]
     public function dashboard(): Response
     {
-        $openProjects = $this->projectRepository->getAllOpen();
-        $openProjectsCount = count($openProjects);
-        $deliveredProjects = $this->projectRepository->getAllDelivered();
-        $deliveredProjectsCount = count($deliveredProjects);
-        $totalProjectsCount = $openProjectsCount + $deliveredProjectsCount;
+        $totalProjectsCount = $this->projectRepository->count([]);
+        $openProjectsCount = $this->projectRepository->countOpen();
+        $deliveredProjectsCount = $totalProjectsCount - $openProjectsCount;
         $employeeCount = $this->employeeRepository->count([]);
         $deliveryRate = round($deliveredProjectsCount / $totalProjectsCount * 100);
         $productionTime = $this->worktimeRepository->getGlobalProductionTime();
@@ -38,44 +36,9 @@ final class MainController extends AbstractController
             "delivered_projects" => $deliveredProjectsCount,
             "open_projects" => $openProjectsCount,
             "profitable_rate" => $profitableRate,
-            "employee_count" => $employeeCount,
             "delivery_rate" => $deliveryRate,
+            "employee_count" => $employeeCount,
             "production_time" => $productionTime,
-        ]);
-    }
-
-    public function latestProjectsTable(): Response
-    {
-        $latestProjects = $this->projectRepository->getLatest(6);
-
-        return $this->render('main/components/_projects_table.html.twig', [
-            'projects' => $latestProjects,
-            'title' => "Les derniers projets"
-        ]);
-    }
-
-    public function latestWorktimesList(): Response
-    {
-        $latestWorktimes = $this->worktimeRepository->getLatest(6);
-
-        return $this->render('main/components/_worktimes_list.html.twig', [
-            'worktimes' => $latestWorktimes,
-            'title' => "Temps de production"
-        ]);
-    }
-
-    public function bestEmployeeCard(): Response
-    {
-        return $this->employeeCard();
-    }
-
-    public function employeeCard(?int $employeeId = null): Response
-    {
-        $employee = $employeeId ? $this->employeeRepository->getById($employeeId) : $this->employeeRepository->getBest();
-
-        return $this->render('main/components/_employee_card.html.twig', [
-            'employee' => $employee,
-            'title' => $employeeId ? "Employé" : "Top employé"
         ]);
     }
 

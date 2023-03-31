@@ -15,16 +15,27 @@ class WorktimeController extends AbstractController
         private WorktimeRepository $worktimeRepository
     ) {}
 
+    public function listLatest(): Response
+    {
+        $latestWorktimes = $this->worktimeRepository->getLatest(6);
+
+        return $this->render('main/components/_worktimes_list.html.twig', [
+            'worktimes' => $latestWorktimes,
+            'title' => 'Temps de production'
+        ]);
+    }
+
     public function listProjectWorktimes(string $route, int $projectId, int $page = 1): Response
     {
-        if($page < 1) {
-            return $this->redirectToRoute($route, ['id' => $projectId]);
-        }
-        
         $totalWorktimes = $this->worktimeRepository->countOfProject($projectId);
         $numberOfPages = max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE));
-        if($page > $numberOfPages) {
-            return $this->redirectToRoute($route, ['id' => $projectId, 'page' => $numberOfPages]);
+        if($page < 1 || $numberOfPages < $page) {
+            return $this->render('components/_invalid_pagination.html.twig', [
+                'title' => 'Historique des temps de production',
+                'id' => $projectId,
+                'route' => $route,
+                'last_page' => $numberOfPages
+            ]);
         }
         
         $worktimes = $this->worktimeRepository->getOfProject($projectId, $page);
@@ -42,14 +53,15 @@ class WorktimeController extends AbstractController
 
     public function listEmployeeWorktimes(string $route, int $employeeId, int $page = 1): Response
     {
-        if($page < 1) {
-            return $this->redirectToRoute($route, ['id' => $employeeId]);
-        }
-
         $totalWorktimes = $this->worktimeRepository->countOfEmployee($employeeId);
         $numberOfPages = max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE));
-        if($page > $numberOfPages) {
-            return $this->redirectToRoute($route, ['id' => $employeeId, 'page' => $numberOfPages]);
+        if($page < 1 || $numberOfPages < $page) {
+            return $this->render('components/_invalid_pagination.html.twig', [
+                'title' => 'Historique des temps de production',
+                'id' => $employeeId,
+                'route' => $route,
+                'last_page' => $numberOfPages
+            ]);
         }
 
         $worktimes = $this->worktimeRepository->getOfEmployee($employeeId, $page);

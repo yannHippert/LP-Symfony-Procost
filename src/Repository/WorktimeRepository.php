@@ -52,9 +52,9 @@ class WorktimeRepository extends ServiceEntityRepository
     public function getOfEmployee(int $employeeId, int $page = null): array
     {
         $qb = $this->createQueryBuilder('w');
-        $this->addOrderByCreation($qb);
         $this->addSelectEmployee($qb);
         $this->addSelectProject($qb);
+        $this->addOrderByCreation($qb);
         $this->addWhereEmployee($qb, $employeeId);
         $this->addPagination($qb, $page);
 
@@ -68,6 +68,7 @@ class WorktimeRepository extends ServiceEntityRepository
     ): array {
         $qb = $this->createQueryBuilder('w');
         $this->addSelectEmployee($qb);
+        $this->addOrderByCreation($qb);
         $this->addWhereProject($qb, $projectId);
         $this->addPagination($qb, $page, $pageSize);
 
