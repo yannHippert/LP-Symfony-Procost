@@ -1,6 +1,10 @@
 # Projet Procost du cours Frameworks/Symfony de Hippert Yann
 
-## Setup docker database
+Nom: Hippert
+Prénom: Yann
+Email: yann.hippert@hotmail.com
+
+## Setup docker mysql-database
 
 ```sh
 docker-compose -f ./docker/docker-compose.yml up --no-start
@@ -13,12 +17,6 @@ docker-compose -f ./docker/docker-compose.yml start
 ```
 
 Update the env.local file!!
-
-## Start docker database
-
-```sh
-docker-compose -f ./docker/docker-compose.yml start
-```
 
 ## Create database migration file
 
