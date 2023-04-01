@@ -36,7 +36,7 @@ class EmployeeController extends AbstractController
     public function __construct(
         private EmployeeRepository $employeeRepository,
         private ProjectRepository $projectRepository,
-        private WorktimeRepository $workTimeRepository,
+        private WorktimeRepository $worktimeRepository,
         private EmployeeFactoryInterface $employeeFactory,
         private EmployeeManager $employeeManager,
         private WorktimeManager $workTimeManager,
@@ -80,25 +80,37 @@ class EmployeeController extends AbstractController
         } catch(UnexpectedResultException) {
             throw new NotFoundHttpException();
         }
-        
-        $workTimeData = new WorktimeData();
-        $form = $this->createForm(WorktimeDataType::class, $workTimeData);
-        $form->handleRequest($request);
 
+        $worktimeData = new WorktimeData();
+        $form = $this->createForm(WorktimeDataType::class, $worktimeData);
+        $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
-            if($workTimeData->getProject()->getDeliveredAt() != null) {
+            if($worktimeData->getProject()->getDeliveredAt() != null) {
                 throw new BadRequestHttpException();
             }
 
-            $this->workTimeManager->addWorktime($workTimeData, $employee);
+            $this->workTimeManager->addWorktime($worktimeData, $employee);
 
             return $this->redirectToRoute('employee_details', ['id' => $id, 'page' => $page]);
         }
+
+        $totalWorktimes = $this->worktimeRepository->countOfEmployee($id);
+        $numberOfPages = max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE));
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
+        }
+
+        $worktimes = $this->worktimeRepository->getOfEmployee($id, $page);
 
         return $this->render('employee/details.html.twig', [
             'employee' => $employee,
             'page' => $page,
             'form' => $form,
+            'worktimes' => $worktimes,
+            'pagination' => [
+                'current' => $page,
+                'total' => $numberOfPages
+            ],
         ]);
     }
 
@@ -128,6 +140,8 @@ class EmployeeController extends AbstractController
                 $action = "updateEmployee";
                 $title = "Edition d'un employé";
                 break;
+            default: 
+                throw new HttpException(500, "Invalid form-type");
         }
 
         if($form->isSubmitted() && $form->isValid()) {
@@ -144,33 +158,6 @@ class EmployeeController extends AbstractController
             'title' => $title
         ]);
     }
-
-    public function listOfProfession(string $route, int $professionId, int $page = 1): Response
-    {
-        $totalEmployees = $this->employeeRepository->countOfProfession($professionId);
-        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
-        if($page < 1 || $numberOfPages < $page) {
-            return $this->render('components/_invalid_pagination.html.twig', [
-                'title' => 'Employés',
-                'id' => $professionId,
-                'route' => $route,
-                'last_page' => $numberOfPages
-            ]);
-        }
-        
-        $page = min(max(1, $page), $numberOfPages);
-        $employees = $this->employeeRepository->getOfProfession($professionId, max(1, $page));
-
-        return $this->render('profession/components/_employees_table.html.twig', [
-            'profession_id' => $professionId,
-            'employees' => $employees,
-            'pagination' => [
-                'current' => $page,
-                'total' => $numberOfPages
-            ],
-            'route' => $route,
-        ]);
-    } 
 
     public function bestEmployeeCard(): Response
     {

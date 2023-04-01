@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Employee;
 use App\Entity\Profession;
 use App\EventManager\ProfessionManager;
 use App\Factory\Profession\ProfessionFactoryInterface;
 use App\Form\ProfessionType;
+use App\Repository\EmployeeRepository;
 use App\Repository\ProfessionRepository;
 use Doctrine\ORM\UnexpectedResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +31,7 @@ class ProfessionController extends AbstractController
         private ProfessionRepository $professionRepository,
         private ProfessionFactoryInterface $professionFactory,
         private ProfessionManager $professionManager,
+        private EmployeeRepository $employeeRepository,
     ) {}
 
     #[Route('/professions/{page}', name: 'professions_list', methods: 'GET', requirements: ['page' => '\d+'])]
@@ -68,9 +71,23 @@ class ProfessionController extends AbstractController
             throw new NotFoundHttpException();
         }
 
+        $totalEmployees = $this->employeeRepository->countOfProfession($id);
+        $numberOfPages = max(1, ceil($totalEmployees / Employee::PAGE_SIZE));
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
+        }
+        
+        $page = min(max(1, $page), $numberOfPages);
+        $employees = $this->employeeRepository->getOfProfession($id, max(1, $page));
+
         return $this->render('profession/details.html.twig', [
             'profession' => $profession,
             'page' => $page,
+            'employees' => $employees,
+            'pagination' => [
+                'current' => $page,
+                'total' => $numberOfPages
+            ],
         ]);
     }
 
@@ -118,6 +135,8 @@ class ProfessionController extends AbstractController
                 $action = "updateProfession";
                 $title = "Edition d'une profession";
                 break;
+            default: 
+                throw new HttpException(500, "Invalid form-type");
         }
 
         if($form->isSubmitted() && $form->isValid()) {

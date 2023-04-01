@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\Worktime;
 use App\EventManager\ProjectManager;
 use App\Factory\Project\ProjectFactoryInterface;
 use App\Form\ProjectType;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-enum ProjectFromType
+enum ProjectFormType
 {
     case Create;
     case Update;  
@@ -29,7 +30,7 @@ class ProjectController extends AbstractController
     public function __construct(
         private ProjectRepository $projectRepository,
         private EmployeeRepository $employeeRepository,
-        private WorktimeRepository $workTimeRepository,
+        private WorktimeRepository $worktimeRepository,
         private ProjectFactoryInterface $projectFactory,
         private ProjectManager $projectManager
     ) {}
@@ -59,7 +60,7 @@ class ProjectController extends AbstractController
     {
         $project = $this->projectFactory->createProject();
 
-        return $this->project_form($request, $project, ProjectFromType::Create);
+        return $this->project_form($request, $project, ProjectFormType::Create);
     }
 
     #[Route('/project/{id}/{page}', name: 'project_details', requirements: ['id' => '\d+', 'page' => '\d+'], methods: 'GET')]
@@ -71,12 +72,24 @@ class ProjectController extends AbstractController
             throw new NotFoundHttpException();
         }
 
+        $totalWorktimes = $this->worktimeRepository->countOfProject($id);
+        $numberOfPages = max(1, ceil($totalWorktimes / Worktime::PAGE_SIZE));
+        if($page < 1 || $numberOfPages < $page) {
+            throw new NotFoundHttpException();
+        }
+            
+        $worktimes = $this->worktimeRepository->getOfProject($id, $page);
+    
         $employeeCount = $this->employeeRepository->countOfProject($id);
 
         return $this->render('project/details.html.twig', [
             "project" => $project,
-            "page" => $page,
             "employeeCount" => $employeeCount,
+            'worktimes' => $worktimes,
+            'pagination' => [
+                'current' => $page,
+                'total' =>  $numberOfPages
+            ],
         ]);
     }
     
@@ -93,7 +106,7 @@ class ProjectController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        return $this->project_form($request, $project, ProjectFromType::Update);
+        return $this->project_form($request, $project, ProjectFormType::Update);
     }
 
     #[Route('/project/{id}/deliver', name: 'project_deliver', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -115,20 +128,22 @@ class ProjectController extends AbstractController
         return $this->redirectToRoute('project_details', ["id" => $project->getId()]);
     }
 
-    private function project_form(Request $request, Project $project, ProjectFromType $formType): Response
+    private function project_form(Request $request, Project $project, ProjectFormType $formType): Response
     {
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
 
         switch($formType) {
-            case EmployeeFromType::Create:
+            case ProjectFormType::Create:
                 $action = "addProject";
                 $title = "Création d'un projet";
                 break;
-            case EmployeeFromType::Update:
+            case ProjectFormType::Update:
                 $action = "updateProject";
                 $title = "Edition d'un projet";
                 break;
+            default: 
+                throw new HttpException(500, "Invalid form-type");
         }
 
         if($form->isSubmitted() && $form->isValid()) {
@@ -137,12 +152,6 @@ class ProjectController extends AbstractController
             }
 
             $this->projectManager->$action($project);
-
-            return $this->redirectToRoute('project_details', ["id" => $project->getId()]);
-        }
-
-        if($form->isSubmitted() && $form->isValid()) {
-            $this->projectManager->addProject($project);
 
             return $this->redirectToRoute('project_details', ["id" => $project->getId()]);
         }

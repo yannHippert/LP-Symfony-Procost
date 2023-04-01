@@ -75,13 +75,36 @@
     </div>
 
     <div class="col-md-8">
-        {{ render(controller('App\\Controller\\WorktimeController::listProjectWorktimes', 
-            { 
-                route: app.request.get('_route'), 
-                projectId: project.id, 
-                page: app.request.get('_route_params').page ?? 1, 
-            })) 
-        }}
+        <div class="tile pb-5">
+            <h3 class="tile-title">Historique des temps de production</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Temps</th>
+                            <th>Date de saisie</th>
+                            <th>Coût total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for worktime in worktimes %}
+                            <tr>
+                                <td>
+                                    <a href={{ path("employee_details", { id: worktime.employee.id }) }}>{{ worktime.employee.fullName }}</a>
+                                </td>
+                                <td>{{ worktime.daysSpent }} jours</td>
+                                <td>{{ worktime.createdAt|date("d-m-Y") }}</td>
+                                <td>{{ worktime.totalPrice|format_currency('EUR') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr/>
+
+            {% include "components/paginator.html.twig" with { id: project.id } %}
+        </div>
     </div>
 </div>
 {% endblock %}
